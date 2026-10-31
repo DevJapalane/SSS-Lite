@@ -70,13 +70,22 @@ function formatSignificant(value: number, digits: number): string {
   return formatter.format(value)
 }
 
+// "153 milhões": a row of zeros ("153.000.000") is hard to read at a glance.
+const millionsFormatter = new Intl.NumberFormat(LOCALE, {
+  notation: 'compact',
+  compactDisplay: 'long',
+  maximumSignificantDigits: 3,
+})
+
 /**
- * Ratio to Earth with precision that adapts to the size: big ratios are
- * rounded (Sun mass "333.000", not a falsely precise "333.065"), tiny ones
- * keep significant digits (Pluto mass "0,0022") or they would all read "0".
+ * Ratio with precision that adapts to the size: big ratios are rounded (Sun
+ * mass "333.000", not a falsely precise "333.065"), tiny ones keep
+ * significant digits (Pluto mass "0,0022") or they would all read "0".
+ * From a million up, words replace the zeros (Sun × Pluto mass: "153 milhões").
  */
 export function formatRatio(ratio: number): string {
   const abs = Math.abs(ratio)
+  if (abs >= 1e6) return millionsFormatter.format(ratio)
   if (abs >= 1000) return formatSignificant(ratio, 3)
   if (abs >= 100) return formatDecimal(ratio, 0)
   if (abs >= 10) return formatDecimal(ratio, 1)

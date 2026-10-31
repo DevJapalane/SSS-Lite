@@ -1,0 +1,59 @@
+.label {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* Centred over the body and lifted a little above its top edge. */
+  transform: translate(-50%, -8px);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  font: 500 0.8125rem var(--font-body);
+  white-space: nowrap;
+  color: var(--color-text);
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  backdrop-filter: blur(var(--blur-panel));
+  -webkit-backdrop-filter: blur(var(--blur-panel));
+  cursor: pointer;
+}
+
+/* Small pointer from the pill down to the body. */
+.label::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  background: inherit;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  transform: rotate(45deg);
+}
+
+/*
+ * The pill is 32px tall to stay discreet next to small bodies; this
+ * invisible margin grows the tappable area to the recommended 44px.
+ */
+.label::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.label:hover {
+  border-color: var(--color-accent);
+}
+
+.label:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.label[hidden] {
+  display: none;
+}

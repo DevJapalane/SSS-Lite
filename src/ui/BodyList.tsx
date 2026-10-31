@@ -1,5 +1,5 @@
 import { useRef, type CSSProperties, type KeyboardEvent } from 'react'
-import { bodies, type BodyId } from '../data/bodies'
+import { bodies } from '../data/bodies'
 import { useAppStore } from '../store/useAppStore'
 import { BodyBadge } from './BodyBadge'
 import styles from './BodyList.module.css'
@@ -10,16 +10,8 @@ import styles from './BodyList.module.css'
  */
 export function BodyList() {
   const selectedBodyId = useAppStore((s) => s.selectedBodyId)
-  const selectBody = useAppStore((s) => s.selectBody)
-  const setViewMode = useAppStore((s) => s.setViewMode)
+  const goToBody = useAppStore((s) => s.goToBody)
   const buttons = useRef<(HTMLButtonElement | null)[]>([])
-
-  function choose(id: BodyId) {
-    selectBody(id)
-    // Picking a body always takes you to it: in system view a selection with
-    // no visible effect would feel broken.
-    setViewMode('body')
-  }
 
   // Arrow keys move between items so a keyboard user doesn't have to Tab
   // through all ten; both axes work because the list is vertical on desktop
@@ -54,7 +46,7 @@ export function BodyList() {
               type="button"
               className={styles.item}
               aria-pressed={body.id === selectedBodyId}
-              onClick={() => choose(body.id)}
+              onClick={() => goToBody(body.id)}
             >
               <span
                 className={styles.swatch}

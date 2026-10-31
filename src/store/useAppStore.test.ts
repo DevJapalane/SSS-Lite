@@ -21,4 +21,19 @@ describe('useAppStore', () => {
     expect(state.viewMode).toBe('system')
     expect(state.unit).toBe('earth')
   })
+
+  it('changes one side of the comparison without touching the other', () => {
+    const { setCompareBody } = useAppStore.getState()
+    setCompareBody('b', 'pluto')
+    expect(useAppStore.getState().compare).toEqual({ a: 'sun', b: 'pluto' })
+  })
+
+  it('goToBody selects and switches to body view in one step', () => {
+    const { setViewMode, goToBody } = useAppStore.getState()
+    setViewMode('compare')
+    goToBody('saturn')
+    const state = useAppStore.getState()
+    expect(state.selectedBodyId).toBe('saturn')
+    expect(state.viewMode).toBe('body')
+  })
 })

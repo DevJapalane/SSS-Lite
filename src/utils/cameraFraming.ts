@@ -40,3 +40,21 @@ export function lineupFitDistance(
   const byHeight = height / 2 / Math.tan(vHalf)
   return Math.max(byWidth, byHeight) * padding
 }
+
+/**
+ * Radius, in CSS pixels, of a sphere as drawn on screen.
+ *
+ * The sphere's silhouette spans an angle asin(r / d); its tangent divided by
+ * tan(fov / 2) is the share of half the screen height it covers.
+ */
+export function projectedRadiusPx(
+  radius: number,
+  distance: number,
+  verticalFovDeg: number,
+  viewportHeightPx: number,
+): number {
+  // Camera inside or touching the sphere: it covers the whole screen.
+  if (distance <= radius) return Infinity
+  const tanAngle = radius / Math.sqrt(distance * distance - radius * radius)
+  return (tanAngle / Math.tan(toRad(verticalFovDeg) / 2)) * (viewportHeightPx / 2)
+}

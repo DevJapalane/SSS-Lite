@@ -3,9 +3,10 @@ import { useThree } from '@react-three/fiber'
 import { useEffect, useRef } from 'react'
 import { PerspectiveCamera, Vector3 } from 'three'
 import { getBodyById, type BodyId } from '../data/bodies'
-import { useAppStore, type ViewMode } from '../store/useAppStore'
+import { useAppStore, type CompareSlot, type ViewMode } from '../store/useAppStore'
 import { MOBILE_QUERY, useMediaQuery } from '../ui/useMediaQuery'
 import { lineupFitDistance, sphereFitDistance } from '../utils/cameraFraming'
+import { computeCompareLayout } from '../utils/scale'
 import { lineupBounds, systemLayout } from './systemLayout'
 
 const { ACTION } = CameraControlsImpl
@@ -14,6 +15,9 @@ const { ACTION } = CameraControlsImpl
 // lit hemisphere with the day/night line near the edge.
 const BODY_VIEW_DIRECTION = new Vector3(-0.45, 0.25, 1).normalize()
 const SYSTEM_VIEW_DIRECTION = new Vector3(0, 0.35, 1).normalize()
+// Nearly head-on: seen from the side, perspective would make the nearer
+// body look bigger and distort the real-scale comparison.
+const COMPARE_VIEW_DIRECTION = new Vector3(0, 0.12, 1).normalize()
 
 interface Shot {
   target: Vector3
@@ -25,7 +29,27 @@ interface Shot {
   allowPan: boolean
 }
 
-function planShot(viewMode: ViewMode, bodyId: BodyId, fov: number, aspect: number): Shot {
+function planShot(
+  viewMode: ViewMode,
+  bodyId: BodyId,
+  compare: Record<CompareSlot, BodyId>,
+  fov: number,
+  aspect: number,
+): Shot {
+  if (viewMode === 'compare') {
+    const layout = computeCompareLayout(getBodyById(compare.a), getBodyById(compare.b))
+    const distance = lineupFitDistance(layout.width, layout.height, fov, aspect, 1.25)
+    return {
+      // The layout is centred on the origin.
+      target: new Vector3(0, 0, 0),
+      direction: COMPARE_VIEW_DIRECTION,
+      distance,
+      minDistance: distance * 0.25,
+      maxDistance: distance * 3,
+      allowPan: true,
+    }
+  }
+
   if (viewMode === 'system') {
     const distance = lineupFitDistance(lineupBounds.width, lineupBounds.height, fov, aspect)
     return {
@@ -39,7 +63,7 @@ function planShot(viewMode: ViewMode, bodyId: BodyId, fov: number, aspect: numbe
     }
   }
 
-  // 'body' (and 'compare' until it exists): one body, centred.
+  // 'body': one body, centred.
   const body = getBodyById(bodyId)
   const { x, radius } = systemLayout[body.id]
   // Frame the rings too, otherwise Saturn's would be cut off.
@@ -85,6 +109,7 @@ export function CameraRig() {
   const getState = useThree((s) => s.get)
   const viewMode = useAppStore((s) => s.viewMode)
   const selectedBodyId = useAppStore((s) => s.selectedBodyId)
+  const compare = useAppStore((s) => s.compare)
   // On phones the panels sit at the bottom, so nothing covers the sides.
   const isMobile = useMediaQuery(MOBILE_QUERY)
   // Increments on every new flight so an old flight that finishes late
@@ -111,7 +136,7 @@ export function CameraRig() {
     // away from where the user left it.
     const { width, height } = getState().size
     const freeWidth = Math.max(width - insets.current.left - insets.current.right, width * 0.4)
-    const shot = planShot(viewMode, selectedBodyId, camera.fov, freeWidth / height)
+    const shot = planShot(viewMode, selectedBodyId, compare, camera.fov, freeWidth / height)
 
     // Loose limits during the flight; tight ones would make the camera snap
     // to them instead of gliding.
@@ -130,7 +155,7 @@ export function CameraRig() {
         c.minDistance = shot.minDistance
         c.maxDistance = shot.maxDistance
       })
-  }, [viewMode, selectedBodyId, camera, getState])
+  }, [viewMode, selectedBodyId, compare, camera, getState])
 
   return (
     <CameraControls

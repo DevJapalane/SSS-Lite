@@ -12,6 +12,9 @@
 .scene {
   position: absolute;
   inset: 0;
+  /* Own stacking context: the floating 3D labels (z-index set by drei)
+     stay inside the scene layer and never cover the panels. */
+  z-index: 0;
 }
 
 .panelBase {
@@ -89,16 +92,21 @@
     gap: 0;
   }
 
+  /* Three view buttons don't fit beside the title on a phone: they get a
+     row of their own, full width. Grid blockifies the inline-flex group so
+     it stretches. */
   .viewControls {
-    left: auto;
+    top: 68px;
+    left: var(--space-3);
     right: var(--space-3);
     transform: none;
+    display: grid;
   }
 
-  /* Bottom of the screen is taken by the bar and card; sit under the title. */
+  /* Bottom of the screen is taken by the bar and card; sit under the switch. */
   .notice {
     bottom: auto;
-    top: 72px;
+    top: 126px;
   }
 
   .list {

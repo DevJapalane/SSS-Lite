@@ -4,6 +4,7 @@ import { SegmentedControl } from './SegmentedControl'
 const OPTIONS = [
   { value: 'body', label: 'Corpo' },
   { value: 'system', label: 'Sistema' },
+  { value: 'compare', label: 'Comparar' },
 ] as const satisfies readonly { value: ViewMode; label: string }[]
 
 export function ViewModeSwitch() {
@@ -13,8 +14,7 @@ export function ViewModeSwitch() {
     <SegmentedControl
       ariaLabel="Modo de visualização"
       options={OPTIONS}
-      // 'compare' has no button yet; until it does, show it as body view.
-      value={viewMode === 'system' ? 'system' : 'body'}
+      value={viewMode}
       onChange={setViewMode}
     />
   )

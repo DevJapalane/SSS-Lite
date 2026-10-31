@@ -1,14 +1,20 @@
-import { useAppStore } from '../store/useAppStore'
+import { useAppStore, type ViewMode } from '../store/useAppStore'
 import styles from './ScaleNotice.module.css'
 
-/** Discreet warning, shown only where sizes and distances are compressed. */
+const MESSAGES: Partial<Record<ViewMode, string>> = {
+  system: 'Tamanhos e distâncias fora de escala',
+  // The only view with true proportions; saying so is what makes it useful.
+  compare: 'Tamanhos em escala real',
+}
+
+/** Discreet note on how faithful the sizes on screen are. */
 export function ScaleNotice() {
-  const viewMode = useAppStore((s) => s.viewMode)
-  if (viewMode !== 'system') return null
+  const message = MESSAGES[useAppStore((s) => s.viewMode)]
+  if (!message) return null
   // role="note": screen readers announce it as side information, not an alert.
   return (
     <p className={styles.notice} role="note">
-      Tamanhos e distâncias fora de escala
+      {message}
     </p>
   )
 }

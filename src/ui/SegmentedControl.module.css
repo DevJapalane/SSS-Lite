@@ -10,6 +10,8 @@
 }
 
 .option {
+  /* Equal shares when the group is stretched (phone header). */
+  flex: 1;
   /* 44px minimum touch target (WCAG 2.5.5 / Apple HIG). */
   min-height: 44px;
   min-width: 44px;

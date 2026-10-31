@@ -1,12 +1,15 @@
 import styles from './App.module.css'
 import { SceneCanvas } from './scene/SceneCanvas'
+import { useAppStore } from './store/useAppStore'
 import { BodyList } from './ui/BodyList'
+import { ComparePanel } from './ui/ComparePanel'
 import { CreditsDialog } from './ui/CreditsDialog'
 import { InfoPanel } from './ui/InfoPanel'
 import { ScaleNotice } from './ui/ScaleNotice'
 import { ViewModeSwitch } from './ui/ViewModeSwitch'
 
 export default function App() {
+  const isComparing = useAppStore((s) => s.viewMode === 'compare')
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
@@ -30,7 +33,7 @@ export default function App() {
         <SceneCanvas />
       </main>
       <div className={styles.panel} data-occludes="right">
-        <InfoPanel />
+        {isComparing ? <ComparePanel /> : <InfoPanel />}
       </div>
     </div>
   )

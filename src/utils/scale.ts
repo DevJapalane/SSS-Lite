@@ -25,6 +25,51 @@ export interface LayoutEntry {
   radius: number
 }
 
+/** Radius, in scene units, of the larger body of a comparison. */
+const COMPARE_LARGER_RADIUS = 5
+
+type CompareSource = Pick<CelestialBody, 'radiusKm' | 'rings'>
+
+export interface CompareLayout {
+  a: LayoutEntry
+  b: LayoutEntry
+  /** Total extent along X and Y, for the camera to frame both. */
+  width: number
+  height: number
+}
+
+/**
+ * Two bodies side by side at REAL scale relative to each other.
+ *
+ * The larger one always gets the same radius (5 units) and the smaller one
+ * is scaled by the real ratio computed here in 64-bit JavaScript numbers.
+ * The scene therefore only ever holds values between ~0,008 (Pluto next to
+ * the Sun) and 5, whatever the pair: the camera distance, near/far planes
+ * and depth-buffer precision stay the same as in the other views. Feeding
+ * kilometres to the GPU (32-bit floats, Sun = 695.700) would instead need a
+ * huge far plane and make surfaces flicker.
+ */
+export function computeCompareLayout(a: CompareSource, b: CompareSource): CompareLayout {
+  const scale = COMPARE_LARGER_RADIUS / Math.max(a.radiusKm, b.radiusKm)
+  const radiusA = a.radiusKm * scale
+  const radiusB = b.radiusKm * scale
+  // Space taken on the line: Saturn's rings reach well past the planet.
+  const extentA = radiusA * (a.rings?.outerRadiusRatio ?? 1)
+  const extentB = radiusB * (b.rings?.outerRadiusRatio ?? 1)
+  // A gap proportional to the larger body keeps the pair readable as two
+  // separate objects; its length means nothing (not a real distance).
+  const gap = 0.5 * Math.max(extentA, extentB)
+  const width = 2 * extentA + gap + 2 * extentB
+  return {
+    // Centred on the origin, A on the left and B on the right, matching the
+    // order of the selectors.
+    a: { x: -width / 2 + extentA, radius: radiusA },
+    b: { x: width / 2 - extentB, radius: radiusB },
+    width,
+    height: 2 * Math.max(extentA, extentB),
+  }
+}
+
 /**
  * Places bodies on a line along +X, Sun at the origin.
  *
