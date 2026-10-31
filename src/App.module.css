@@ -1,0 +1,86 @@
+/*
+ * The 3D scene fills the whole viewport and the UI floats on top of it as
+ * translucent panels. That way the canvas never resizes when panels change,
+ * which avoids costly WebGL resizes and keeps the space background continuous.
+ */
+.layout {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+}
+
+.panelBase {
+  position: absolute;
+  z-index: 1;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  backdrop-filter: blur(var(--blur-panel));
+  -webkit-backdrop-filter: blur(var(--blur-panel));
+  padding: var(--space-4);
+}
+
+.header {
+  position: absolute;
+  z-index: 1;
+  top: var(--space-4);
+  left: var(--space-4);
+}
+
+.title {
+  font-size: 1.25rem;
+  letter-spacing: 0.02em;
+}
+
+.accent {
+  color: var(--color-accent);
+}
+
+.list {
+  composes: panelBase;
+  top: 64px;
+  bottom: var(--space-4);
+  left: var(--space-4);
+  width: var(--sidebar-width);
+}
+
+.panel {
+  composes: panelBase;
+  top: 64px;
+  right: var(--space-4);
+  width: var(--panel-width);
+  max-height: calc(100% - 64px - var(--space-4));
+}
+
+/* Phone: list becomes a bottom bar, info panel a bottom card above it. */
+@media (max-width: 768px) {
+  .header {
+    top: var(--space-3);
+    left: var(--space-3);
+  }
+
+  .list {
+    top: auto;
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+    width: auto;
+    height: 72px;
+    padding: var(--space-3);
+  }
+
+  .panel {
+    top: auto;
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: calc(72px + var(--space-3) * 2 + env(safe-area-inset-bottom));
+    width: auto;
+    max-height: 40%;
+    padding: var(--space-3) var(--space-4);
+  }
+}
