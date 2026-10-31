@@ -23,9 +23,15 @@ export interface CelestialBody {
   gravity: number
   /** Mean orbital velocity in km/s. `null` for the Sun: it is the reference frame. */
   orbitalVelocityKmS: number | null
-  /** Sidereal rotation period in hours. Negative means retrograde rotation. */
+  /**
+   * Sidereal rotation period in hours. Negative means retrograde rotation
+   * (shown in the UI); the 3D spin derives direction from `axialTiltDeg`.
+   */
   rotationPeriodHours: number
-  /** Axial tilt (obliquity) in degrees. Above 90° also indicates retrograde spin. */
+  /**
+   * Axial tilt (obliquity) in degrees. Above 90° the spin axis is flipped,
+   * which is what makes a body rotate retrograde.
+   */
   axialTiltDeg: number
   /** Mean distance from the Sun in millions of km. `null` for the Sun itself. */
   distanceFromSunMkm: number | null
@@ -35,6 +41,15 @@ export interface CelestialBody {
   fallbackColor: string
   /** WebP file name inside /public/textures (see its README). */
   texture?: string
+  rings?: Rings
+}
+
+export interface Rings {
+  /** Inner and outer edge as multiples of the body radius. */
+  innerRadiusRatio: number
+  outerRadiusRatio: number
+  /** Strip texture with alpha: left edge = inner ring, right edge = outer ring. */
+  texture: string
 }
 
 // `as const satisfies` keeps each `id` as a literal type (so BodyId below is
@@ -144,6 +159,8 @@ export const bodies = [
     orbitalPeriodDays: 10747,
     fallbackColor: '#e0c98f',
     texture: 'saturn.webp',
+    // C ring inner edge (~74 500 km) to A ring outer edge (~136 800 km).
+    rings: { innerRadiusRatio: 1.24, outerRadiusRatio: 2.27, texture: 'saturn_ring_alpha.webp' },
   },
   {
     id: 'uranus',

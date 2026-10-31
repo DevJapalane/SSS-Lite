@@ -41,6 +41,23 @@
   color: var(--color-accent);
 }
 
+.viewControls {
+  position: absolute;
+  z-index: 1;
+  top: var(--space-3);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.notice {
+  position: absolute;
+  z-index: 1;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
 .list {
   composes: panelBase;
   top: 64px;
@@ -62,6 +79,18 @@
   .header {
     top: var(--space-3);
     left: var(--space-3);
+  }
+
+  .viewControls {
+    left: auto;
+    right: var(--space-3);
+    transform: none;
+  }
+
+  /* Bottom of the screen is taken by the bar and card; sit under the title. */
+  .notice {
+    bottom: auto;
+    top: 56px;
   }
 
   .list {
