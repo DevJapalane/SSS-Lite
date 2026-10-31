@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { PerspectiveCamera, Vector3 } from 'three'
 import { getBodyById, type BodyId } from '../data/bodies'
 import { useAppStore, type ViewMode } from '../store/useAppStore'
+import { MOBILE_QUERY, useMediaQuery } from '../ui/useMediaQuery'
 import { lineupFitDistance, sphereFitDistance } from '../utils/cameraFraming'
 import { lineupBounds, systemLayout } from './systemLayout'
 
@@ -57,6 +58,21 @@ function planShot(viewMode: ViewMode, bodyId: BodyId, fov: number, aspect: numbe
   }
 }
 
+interface SideInsets {
+  left: number
+  right: number
+}
+
+/** Pixels covered by the side panels, measured from the DOM. */
+function measureSideInsets(viewportWidth: number): SideInsets {
+  const left = document.querySelector('[data-occludes="left"]')?.getBoundingClientRect()
+  const right = document.querySelector('[data-occludes="right"]')?.getBoundingClientRect()
+  return {
+    left: left ? left.right : 0,
+    right: right ? viewportWidth - right.left : 0,
+  }
+}
+
 /**
  * Owns the camera: flies to the right spot whenever the view or the selected
  * body changes, then applies the zoom limits and gestures of that view.
@@ -64,19 +80,38 @@ function planShot(viewMode: ViewMode, bodyId: BodyId, fov: number, aspect: numbe
 export function CameraRig() {
   const controls = useRef<CameraControlsImpl>(null)
   const camera = useThree((s) => s.camera) as PerspectiveCamera
+  const size = useThree((s) => s.size)
+  // Reads the current R3F state without subscribing to it.
+  const getState = useThree((s) => s.get)
   const viewMode = useAppStore((s) => s.viewMode)
   const selectedBodyId = useAppStore((s) => s.selectedBodyId)
+  // On phones the panels sit at the bottom, so nothing covers the sides.
+  const isMobile = useMediaQuery(MOBILE_QUERY)
   // Increments on every new flight so an old flight that finishes late
   // can't apply its limits on top of the current one.
   const flightId = useRef(0)
+  const insets = useRef<SideInsets>({ left: 0, right: 0 })
+
+  // Shift the rendered image so the scene is centred in the free space
+  // between the side panels. setViewOffset moves the picture, not the
+  // camera, so orbiting still circles the body instead of an empty point.
+  useEffect(() => {
+    insets.current = isMobile ? { left: 0, right: 0 } : measureSideInsets(size.width)
+    const shift = (insets.current.left - insets.current.right) / 2
+    if (shift === 0) camera.clearViewOffset()
+    else camera.setViewOffset(size.width, size.height, -shift, 0, size.width, size.height)
+  }, [camera, size.width, size.height, isMobile])
 
   useEffect(() => {
     const c = controls.current
     if (!c) return
     const id = ++flightId.current
-    // Aspect is read here instead of subscribed to: rotating the phone
-    // shouldn't yank the camera away from where the user left it.
-    const shot = planShot(viewMode, selectedBodyId, camera.fov, camera.aspect)
+    // Frame for the visible width only. Size is read with getState() instead
+    // of being a dependency: rotating the phone shouldn't yank the camera
+    // away from where the user left it.
+    const { width, height } = getState().size
+    const freeWidth = Math.max(width - insets.current.left - insets.current.right, width * 0.4)
+    const shot = planShot(viewMode, selectedBodyId, camera.fov, freeWidth / height)
 
     // Loose limits during the flight; tight ones would make the camera snap
     // to them instead of gliding.
@@ -95,7 +130,7 @@ export function CameraRig() {
         c.minDistance = shot.minDistance
         c.maxDistance = shot.maxDistance
       })
-  }, [viewMode, selectedBodyId, camera])
+  }, [viewMode, selectedBodyId, camera, getState])
 
   return (
     <CameraControls

@@ -28,8 +28,12 @@
 .header {
   position: absolute;
   z-index: 1;
-  top: var(--space-4);
+  top: var(--space-3);
   left: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 50px;
 }
 
 .title {
@@ -58,9 +62,10 @@
   pointer-events: none;
 }
 
+/* Panels start below the top row (title and view switch, ~50px tall). */
 .list {
   composes: panelBase;
-  top: 64px;
+  top: 76px;
   bottom: var(--space-4);
   left: var(--space-4);
   width: var(--sidebar-width);
@@ -68,17 +73,20 @@
 
 .panel {
   composes: panelBase;
-  top: 64px;
+  top: 76px;
   right: var(--space-4);
   width: var(--panel-width);
-  max-height: calc(100% - 64px - var(--space-4));
+  max-height: calc(100% - 76px - var(--space-4));
+  /* Lets the data list scroll inside the panel instead of overflowing it. */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Phone: list becomes a bottom bar, info panel a bottom card above it. */
 @media (max-width: 768px) {
   .header {
-    top: var(--space-3);
     left: var(--space-3);
+    gap: 0;
   }
 
   .viewControls {
@@ -90,7 +98,7 @@
   /* Bottom of the screen is taken by the bar and card; sit under the title. */
   .notice {
     bottom: auto;
-    top: 56px;
+    top: 72px;
   }
 
   .list {
@@ -100,7 +108,8 @@
     bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
     width: auto;
     height: 72px;
-    padding: var(--space-3);
+    /* Vertical room comes from the 48px chips centred in the 72px bar. */
+    padding: 0 var(--space-3);
   }
 
   .panel {
@@ -109,7 +118,7 @@
     right: var(--space-3);
     bottom: calc(72px + var(--space-3) * 2 + env(safe-area-inset-bottom));
     width: auto;
-    max-height: 40%;
-    padding: var(--space-3) var(--space-4);
+    max-height: 55%;
+    padding: var(--space-2) var(--space-4) var(--space-3);
   }
 }

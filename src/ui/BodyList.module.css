@@ -1,0 +1,115 @@
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  height: 100%;
+  min-height: 0;
+}
+
+.heading {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  padding: 0 var(--space-2);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  font: 400 0.9375rem var(--font-body);
+  color: var(--color-text);
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.item[aria-pressed='true'] {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+/* Small sphere: a gradient fakes light from the upper left. */
+.swatch {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--swatch) 60%, white),
+    var(--swatch) 45%,
+    color-mix(in srgb, var(--swatch) 45%, black)
+  );
+}
+
+.name {
+  flex: 1;
+  white-space: nowrap;
+}
+
+/* Phone: horizontal scrolling bar of chips. */
+@media (max-width: 768px) {
+  .heading {
+    /* Visually hidden but still read by screen readers via the nav label. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .list {
+    flex-direction: row;
+    gap: var(--space-2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Snap so a flick stops on an item, not halfway through one. */
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    height: 100%;
+    align-items: center;
+  }
+
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .list li {
+    scroll-snap-align: start;
+  }
+
+  .item {
+    width: auto;
+    min-height: 48px;
+    padding: 0 var(--space-3);
+    gap: var(--space-2);
+    border-color: var(--color-border);
+  }
+}

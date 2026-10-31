@@ -1,9 +1,10 @@
 import styles from './App.module.css'
 import { SceneCanvas } from './scene/SceneCanvas'
-import { BodyListArea } from './ui/BodyListArea'
-import { InfoPanelArea } from './ui/InfoPanelArea'
+import { BodyList } from './ui/BodyList'
+import { CreditsDialog } from './ui/CreditsDialog'
+import { InfoPanel } from './ui/InfoPanel'
 import { ScaleNotice } from './ui/ScaleNotice'
-import { ViewModeToggle } from './ui/ViewModeToggle'
+import { ViewModeSwitch } from './ui/ViewModeSwitch'
 
 export default function App() {
   return (
@@ -12,22 +13,25 @@ export default function App() {
         <h1 className={styles.title}>
           SSS <span className={styles.accent}>Lite</span>
         </h1>
+        <CreditsDialog />
       </header>
       <div className={styles.viewControls}>
-        <ViewModeToggle />
+        <ViewModeSwitch />
       </div>
       <div className={styles.notice}>
         <ScaleNotice />
       </div>
-      <aside className={styles.list}>
-        <BodyListArea />
+      {/* data-occludes: read by the camera to centre the scene in the space
+          the side panels leave free (see scene/CameraRig.tsx). */}
+      <aside className={styles.list} data-occludes="left">
+        <BodyList />
       </aside>
       <main className={styles.scene}>
         <SceneCanvas />
       </main>
-      <section className={styles.panel}>
-        <InfoPanelArea />
-      </section>
+      <div className={styles.panel} data-occludes="right">
+        <InfoPanel />
+      </div>
     </div>
   )
 }
