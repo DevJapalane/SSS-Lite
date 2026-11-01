@@ -36,19 +36,25 @@ export function CreditsDialog() {
             Créditos
           </h2>
           <dl className={styles.list}>
-            <dt>Projeto</dt>
+            <dt>Criação e design</dt>
             <dd>
-              Desenhado por Kalane Maciel, estudante de Engenharia de Software, como aplicativo
-              de aula prática
+              Kalane Maciel, estudante de Engenharia de Software. Aplicativo idealizado e
+              desenvolvido como projeto de aula prática.
             </dd>
-            <dt>Desenvolvimento</dt>
-            <dd>Claude Code, utilizado para acelerar o processo de desenvolvimento</dd>
             <dt>Texturas dos corpos celestes</dt>
             <dd>Solar System Scope, licença CC BY 4.0</dd>
             <dt>Dados</dt>
             <dd>NASA Planetary Fact Sheet, Sun Fact Sheet e Moon Fact Sheet</dd>
             <dt>Fontes tipográficas</dt>
             <dd>Inter e Space Grotesk, licença SIL Open Font License</dd>
+            {/* Disclosure in the style app stores ask for: what AI helped make,
+                and what it didn't. */}
+            <dt>Uso de inteligência artificial</dt>
+            <dd>
+              O código e o ícone deste aplicativo foram criados com o auxílio do Claude Code
+              (Anthropic), utilizado para acelerar o desenvolvimento. As texturas (Solar System
+              Scope) e os dados (NASA) não foram gerados por IA.
+            </dd>
           </dl>
           <p className={styles.note}>
             Na Visão Sistema, tamanhos e distâncias ficam fora de escala para que todos os corpos
