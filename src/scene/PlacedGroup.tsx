@@ -18,7 +18,7 @@ interface Props {
   children: ReactNode
 }
 
-/** Positions a body and everything attached to it (mesh, label). */
+/** Positions a body and everything attached to it (mesh, label, Moon). */
 export function PlacedGroup({ placed, children }: Props) {
   const group = useRef<Group>(null)
   const { position } = placed
@@ -26,7 +26,7 @@ export function PlacedGroup({ placed, children }: Props) {
   useFrame(() => {
     // Mutates the existing Vector3: no object is created per frame.
     if (position.kind === 'orbit' && group.current) {
-      writeOrbitPosition(placed.body.id as BodyId, group.current.position)
+      writeOrbitPosition(placed.body.id as BodyId, position.radius, group.current.position)
     }
   }, ORBIT_FRAME_PRIORITY)
 

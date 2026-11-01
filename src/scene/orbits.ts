@@ -1,7 +1,7 @@
 import type { Vector3 } from 'three'
 import { bodies, type BodyId } from '../data/bodies'
+import { moon } from '../data/moon'
 import { initialOrbitAngle, orbitalAngularSpeed } from '../utils/orbits'
-import { systemLayout } from './systemLayout'
 
 /**
  * Shared simulated time of the orbits, in screen seconds.
@@ -14,23 +14,17 @@ import { systemLayout } from './systemLayout'
 export const orbitClock = { time: 0 }
 
 interface Orbit {
-  radius: number
   start: number
   speed: number
 }
 
 // Fixed for the session: computed once instead of inside the frame loop.
+// The angle doesn't depend on the scale, so switching between compressed
+// and real scale keeps every planet at the same point of its orbit.
 const orbits = Object.fromEntries(
   bodies.map((body, index) => [
     body.id,
-    {
-      // The compressed (log) distance of the old lineup becomes the orbit
-      // radius. Circles are concentric, so the gaps that kept neighbours
-      // apart on the line still keep them apart at any angle.
-      radius: systemLayout[body.id].x,
-      start: initialOrbitAngle(index),
-      speed: orbitalAngularSpeed(body),
-    },
+    { start: initialOrbitAngle(index), speed: orbitalAngularSpeed(body) },
   ]),
 ) as Record<BodyId, Orbit>
 
@@ -40,15 +34,25 @@ export function orbitAngle(id: BodyId): number {
   return start + speed * orbitClock.time
 }
 
+const moonSpeed = orbitalAngularSpeed(moon)
+
+/** Current angle of the Moon around Earth (same clock, its own period). */
+export function moonAngle(): number {
+  return moonSpeed * orbitClock.time
+}
+
 /**
- * Writes the body's current position into `target` and returns it.
- * Takes the vector instead of returning a new one so the frame loop never
- * allocates (no garbage-collector pauses on phones).
+ * Writes the point at `angle` on a circle of `radius` into `target` and
+ * returns it. Takes the vector instead of returning a new one so the frame
+ * loop never allocates (no garbage-collector pauses on phones).
  */
-export function writeOrbitPosition(id: BodyId, target: Vector3): Vector3 {
-  const angle = orbitAngle(id)
-  const { radius } = orbits[id]
+export function writeCirclePoint(angle: number, radius: number, target: Vector3): Vector3 {
   // -sin on Z: three.js' Z points toward the viewer, so this turns
   // counter-clockwise seen from +Y, the direction planets really go.
   return target.set(radius * Math.cos(angle), 0, -radius * Math.sin(angle))
+}
+
+/** Current position of a body on an orbit of `radius` (see writeCirclePoint). */
+export function writeOrbitPosition(id: BodyId, radius: number, target: Vector3): Vector3 {
+  return writeCirclePoint(orbitAngle(id), radius, target)
 }

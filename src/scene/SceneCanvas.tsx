@@ -13,7 +13,11 @@ export function SceneCanvas() {
       // the slightly faded cinematic curve.
       flat
       // Starts far out so the first frame flies in to Earth.
-      camera={{ fov: 45, near: 0.05, far: 1000, position: [0, 40, 140] }}
+      // far: the real-scale system view puts the camera up to ~10 million
+      // units out (1 unit = Earth's radius). A huge far plane costs depth
+      // precision only far from the camera, where bodies are sub-pixel
+      // dots anyway; near the focused body it stays as sharp as before.
+      camera={{ fov: 45, near: 0.05, far: 2e7, position: [0, 40, 140] }}
       // Without this the browser would treat pinch/drag as page zoom/scroll.
       style={{ touchAction: 'none' }}
     >

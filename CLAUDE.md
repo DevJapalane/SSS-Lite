@@ -4,7 +4,7 @@ SSS Lite (Solar System Simulator Lite): app web de visualização 3D do Sistema 
 
 - App web progressivo (PWA), acessado pelo navegador de celulares Android/iOS e desktop. Funciona apenas online.
 - Diferencial: **LEVEZA**. Precisa rodar liso em celular intermediário. Toda decisão técnica deve respeitar isso.
-- Escopo: Sol, 8 planetas e Plutão (identificado como planeta anão).
+- Escopo: Sol, 8 planetas e Plutão (identificado como planeta anão). A Lua aparece orbitando a Terra, só visualmente (fora da lista e do painel).
 - Interface em português do Brasil; código (variáveis, funções, arquivos) em inglês.
 - Dados: tabela fixa no código (`src/data/bodies.ts`), baseada no NASA Planetary Fact Sheet. Sem exibir links no app.
 
@@ -19,8 +19,8 @@ React + TypeScript + Vite, React Three Fiber, @react-three/drei, Zustand (estado
 
 ## Duas visões
 - **Visão Corpo** (padrão): um corpo por vez, grande, centralizado.
-- **Visão Sistema**: todos os corpos juntos. Distâncias SEMPRE comprimidas (nunca reais); exibir aviso discreto "Tamanhos e distâncias fora de escala" quando aplicável.
-- Tamanho em escala real só existe no modo de comparação.
+- **Visão Sistema**: todos os corpos juntos, em órbita. Por padrão, tamanhos e distâncias comprimidos, com o aviso discreto "Tamanhos e distâncias fora de escala". O botão **Escala real** troca para tamanhos e distâncias reais (1 unidade = 1 raio da Terra), com o aviso "Tamanhos e distâncias em escala real" (decidido em 01/11/2026).
+- O modo de comparação mostra dois corpos lado a lado em escala real entre si.
 
 ## Regras de desempenho
 Texturas em WebP de 1K–2K, carregadas sob demanda (lazy + Suspense); limitar devicePixelRatio a no máximo 2; sem pós-processamento pesado; poucas luzes; reaproveitar geometrias.

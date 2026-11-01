@@ -8,7 +8,7 @@ import { MOBILE_QUERY, REDUCED_MOTION_QUERY, useMediaQuery } from '../ui/useMedi
 import { lineupFitDistance, sphereFitDistance } from '../utils/cameraFraming'
 import { computeCompareLayout } from '../utils/scale'
 import { orbitAngle, writeOrbitPosition } from './orbits'
-import { sunRadius, systemLayout, systemRadius } from './systemLayout'
+import { layoutFor, moonLayoutFor, systemRadiusFor } from './systemLayout'
 
 const { ACTION } = CameraControlsImpl
 const UP = new Vector3(0, 1, 0)
@@ -32,12 +32,19 @@ interface Shot {
   maxDistance: number
   /** Whether dragging with two fingers / right button slides the view. */
   allowPan: boolean
+  /**
+   * Zoom toward the pointer instead of the centre. In the system view this
+   * is how you reach a planet: at real scale the centre is the Sun, and
+   * zooming there would never get you to Neptune.
+   */
+  dollyToCursor: boolean
 }
 
 function planShot(
   viewMode: ViewMode,
   bodyId: BodyId,
   compare: Record<CompareSlot, BodyId>,
+  realScale: boolean,
   fov: number,
   aspect: number,
 ): Shot {
@@ -52,6 +59,7 @@ function planShot(
       minDistance: distance * 0.25,
       maxDistance: distance * 3,
       allowPan: true,
+      dollyToCursor: false,
     }
   }
 
@@ -59,8 +67,8 @@ function planShot(
     // The orbit disc seen from above at an angle: as wide as its diameter,
     // as tall as its foreshortened depth (plus the Sun sticking out of it).
     const elevation = Math.asin(SYSTEM_VIEW_DIRECTION.y)
-    const width = 2 * systemRadius
-    const height = width * Math.sin(elevation) + 2 * sunRadius
+    const width = 2 * systemRadiusFor(realScale)
+    const height = width * Math.sin(elevation) + 2 * layoutFor(realScale).sun.radius
     const distance = lineupFitDistance(width, height, fov, aspect)
     return {
       target: new Vector3(0, 0, 0),
@@ -71,26 +79,58 @@ function planShot(
       // Panning lets you slide to a corner of the system, essential on a
       // narrow phone.
       allowPan: true,
+      dollyToCursor: true,
     }
   }
 
   // 'body': one body, centred, wherever its orbit left it.
   const body = getBodyById(bodyId)
-  const { radius } = systemLayout[body.id]
+  const { x, radius } = layoutFor(realScale)[bodyId]
   // Frame the rings too, otherwise Saturn's would be cut off.
   const distance = sphereFitDistance(radius * (body.rings?.outerRadiusRatio ?? 1), fov, aspect)
   return {
-    target: writeOrbitPosition(bodyId, new Vector3()),
+    target: writeOrbitPosition(bodyId, x, new Vector3()),
     direction: BODY_VIEW_DIRECTION.clone().applyAxisAngle(UP, orbitAngle(bodyId)),
     distance,
     // Limits relative to the body: never so close it fills the whole screen
     // (on a narrow phone that already happens well before touching the
-    // surface), never so far it's a dot.
+    // surface), never so far it's a dot. Earth may zoom out far enough to
+    // see the Moon go around it (60 Earth radii away at real scale).
     minDistance: Math.max(radius * 1.3, distance * 0.4),
-    maxDistance: distance * 4,
+    maxDistance: Math.max(distance * 4, bodyId === 'earth' ? moonFitDistance(realScale, fov, aspect) : 0),
     // No panning: the body stays centred and rotating always circles it.
     allowPan: false,
+    dollyToCursor: false,
   }
+}
+
+/** Distance at which the whole orbit of the Moon fits the screen. */
+function moonFitDistance(realScale: boolean, fov: number, aspect: number): number {
+  const { orbitRadius, radius } = moonLayoutFor(realScale)
+  return sphereFitDistance(orbitRadius + radius, fov, aspect, 0.9)
+}
+
+/** Smoothing of an ordinary flight (between bodies, between views), in s. */
+const BASE_SMOOTH_TIME = 0.6
+
+/**
+ * Smoothing time that makes a flight of any length take about as long.
+ *
+ * The camera eases out exponentially: each smoothTime it covers a fixed
+ * share of what is left. Flying from millions of units out (real scale) to
+ * a few units from Earth leaves far more to cover than a hop between
+ * bodies, and at 0,6 s it would take ~7 s to settle. The number of
+ * smoothTimes needed grows with the log of start gap ÷ final precision, so
+ * shortening smoothTime by the same factor keeps every flight near ~3 s.
+ */
+function smoothTimeFor(gap: number, finalDistance: number): number {
+  // Settled = within 0,5% of the final distance.
+  const left = Math.min(0.5, (finalDistance * 0.005) / Math.max(gap, 1e-6))
+  // Roughly how many half-smoothTimes the ease needs to shrink to that.
+  const needed = -Math.log(left) + Math.log(-Math.log(left))
+  // What an ordinary flight between bodies needs (~10).
+  const ordinary = 9.6
+  return BASE_SMOOTH_TIME * Math.min(1, ordinary / needed)
 }
 
 interface SideInsets {
@@ -121,6 +161,7 @@ export function CameraRig() {
   const viewMode = useAppStore((s) => s.viewMode)
   const selectedBodyId = useAppStore((s) => s.selectedBodyId)
   const compare = useAppStore((s) => s.compare)
+  const realScale = useAppStore((s) => s.realScale)
   // On phones the panels sit at the bottom, so nothing covers the sides.
   const isMobile = useMediaQuery(MOBILE_QUERY)
   // A long camera flight is exactly the kind of large on-screen motion this
@@ -150,7 +191,7 @@ export function CameraRig() {
     // away from where the user left it.
     const { width, height } = getState().size
     const freeWidth = Math.max(width - insets.current.left - insets.current.right, width * 0.4)
-    const shot = planShot(viewMode, selectedBodyId, compare, camera.fov, freeWidth / height)
+    const shot = planShot(viewMode, selectedBodyId, compare, realScale, camera.fov, freeWidth / height)
 
     // Loose limits during the flight; tight ones would make the camera snap
     // to them instead of gliding.
@@ -159,17 +200,21 @@ export function CameraRig() {
     c.mouseButtons.right = shot.allowPan ? ACTION.TRUCK : ACTION.NONE
     c.touches.two = shot.allowPan ? ACTION.TOUCH_DOLLY_TRUCK : ACTION.TOUCH_DOLLY
     c.touches.three = shot.allowPan ? ACTION.TOUCH_TRUCK : ACTION.NONE
+    c.dollyToCursor = shot.dollyToCursor
 
     const position = shot.direction.clone().multiplyScalar(shot.distance).add(shot.target)
+    c.smoothTime = smoothTimeFor(camera.position.distanceTo(position), shot.distance)
     // Resolves when the flight ends (or the user interrupts it by dragging).
     void c
       .setLookAt(position.x, position.y, position.z, shot.target.x, shot.target.y, shot.target.z, !reduceMotion)
       .then(() => {
         if (id !== flightId.current) return
+        // Back to the usual easing for wheel and pinch zoom.
+        c.smoothTime = BASE_SMOOTH_TIME
         c.minDistance = shot.minDistance
         c.maxDistance = shot.maxDistance
       })
-  }, [viewMode, selectedBodyId, compare, camera, getState, reduceMotion])
+  }, [viewMode, selectedBodyId, compare, realScale, camera, getState, reduceMotion])
 
   return (
     <CameraControls
@@ -177,7 +222,7 @@ export function CameraRig() {
       makeDefault
       // Longer smoothing for flights between bodies, short while dragging so
       // touch still feels direct.
-      smoothTime={0.6}
+      smoothTime={BASE_SMOOTH_TIME}
       draggingSmoothTime={0.15}
     />
   )

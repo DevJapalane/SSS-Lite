@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { bodies, getBodyById } from '../data/bodies'
-import { computeCompareLayout, computeSystemLayout, displayRadius } from './scale'
+import { computeCompareLayout, computeRealLayout, computeSystemLayout, displayRadius } from './scale'
 
 describe('displayRadius', () => {
   it('keeps Earth at 1 and preserves the size order', () => {
@@ -67,5 +67,31 @@ describe('computeCompareLayout', () => {
     const left = layout.a.x - layout.a.radius * saturn.rings!.outerRadiusRatio
     const right = layout.b.x + layout.b.radius
     expect(left + right).toBeCloseTo(0)
+  })
+})
+
+describe('computeSystemLayout with extra room', () => {
+  it('pushes the neighbours out to make room around a body', () => {
+    const plain = computeSystemLayout(bodies)
+    const roomy = computeSystemLayout(bodies, { earth: 3 })
+    expect(roomy.earth.x - roomy.venus.x).toBeGreaterThan(plain.earth.x - plain.venus.x)
+    expect(roomy.mars.x - roomy.earth.x - 3).toBeGreaterThan(0.5)
+    // The body itself keeps its size.
+    expect(roomy.earth.radius).toBe(plain.earth.radius)
+  })
+})
+
+describe('computeRealLayout', () => {
+  const real = computeRealLayout(bodies)
+
+  it('uses Earth radii as the unit for sizes and distances alike', () => {
+    expect(real.earth.radius).toBe(1)
+    expect(real.sun.radius).toBeCloseTo(109, 0)
+    expect(real.sun.x).toBe(0)
+    expect(real.earth.x).toBeCloseTo(149.6e6 / 6378)
+  })
+
+  it('keeps the real ratios between distances', () => {
+    expect(real.neptune.x / real.earth.x).toBeCloseTo(4515 / 149.6, 6)
   })
 })

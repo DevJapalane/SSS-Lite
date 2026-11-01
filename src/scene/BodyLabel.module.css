@@ -57,3 +57,12 @@
 .label[hidden] {
   display: none;
 }
+
+/* Information only (the Moon): same look, but quieter and not clickable. */
+.tag {
+  min-height: 26px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  cursor: default;
+  pointer-events: none;
+}

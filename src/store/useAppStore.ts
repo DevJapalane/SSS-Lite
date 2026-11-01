@@ -7,6 +7,8 @@ export type ViewMode = 'body' | 'system' | 'compare'
 export type Unit = 'km' | 'earth'
 /** The two sides of the comparison (left and right on screen). */
 export type CompareSlot = 'a' | 'b'
+/** How many times faster than the base orbit speed (1 year = 20 s). */
+export type TimeScale = 1 | 10 | 100
 
 interface AppState {
   selectedBodyId: BodyId
@@ -15,12 +17,20 @@ interface AppState {
   compare: Record<CompareSlot, BodyId>
   /** Whether the system view's orbits are frozen (PB13). */
   orbitsPaused: boolean
+  timeScale: TimeScale
+  /**
+   * System and body views at true proportions (sizes and distances) instead
+   * of the compressed, everything-visible layout.
+   */
+  realScale: boolean
   /** Select a body and show it alone: what every body button does. */
   goToBody: (id: BodyId) => void
   setViewMode: (mode: ViewMode) => void
   setUnit: (unit: Unit) => void
   setCompareBody: (slot: CompareSlot, id: BodyId) => void
   toggleOrbits: () => void
+  setTimeScale: (scale: TimeScale) => void
+  toggleRealScale: () => void
 }
 
 /**
@@ -43,6 +53,8 @@ export const useAppStore = create<AppState>()((set) => ({
   // browsing the list doesn't undo a comparison the user set up.
   compare: { a: 'sun', b: 'earth' },
   orbitsPaused: prefersReducedMotion,
+  timeScale: 1,
+  realScale: false,
   // Picking a body always takes you to it: in system or compare view a
   // selection with no visible effect would feel broken.
   goToBody: (id) => set({ selectedBodyId: id, viewMode: 'body' }),
@@ -53,4 +65,6 @@ export const useAppStore = create<AppState>()((set) => ({
   setUnit: (unit) => set({ unit }),
   setCompareBody: (slot, id) => set((state) => ({ compare: { ...state.compare, [slot]: id } })),
   toggleOrbits: () => set((state) => ({ orbitsPaused: !state.orbitsPaused })),
+  setTimeScale: (timeScale) => set({ timeScale }),
+  toggleRealScale: () => set((state) => ({ realScale: !state.realScale })),
 }))

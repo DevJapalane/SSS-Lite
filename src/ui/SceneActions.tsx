@@ -1,17 +1,28 @@
 import { getBodyById } from '../data/bodies'
-import { useAppStore } from '../store/useAppStore'
+import { useAppStore, type TimeScale } from '../store/useAppStore'
 import { inBody } from '../utils/grammar'
 import styles from './SceneActions.module.css'
+import { SegmentedControl } from './SegmentedControl'
+
+const SPEED_OPTIONS = [
+  { value: '1', label: '1×' },
+  { value: '10', label: '10×' },
+  { value: '100', label: '100×' },
+] as const
 
 /**
- * Buttons that act on the scene outside body view: Focar (PB10) and
- * pause/resume of the orbits (PB13).
+ * Buttons that act on the scene outside body view: Focar (PB10); pause,
+ * speed and real scale of the orbits (system view).
  */
 export function SceneActions() {
   const viewMode = useAppStore((s) => s.viewMode)
   const body = getBodyById(useAppStore((s) => s.selectedBodyId))
   const orbitsPaused = useAppStore((s) => s.orbitsPaused)
   const toggleOrbits = useAppStore((s) => s.toggleOrbits)
+  const timeScale = useAppStore((s) => s.timeScale)
+  const setTimeScale = useAppStore((s) => s.setTimeScale)
+  const realScale = useAppStore((s) => s.realScale)
+  const toggleRealScale = useAppStore((s) => s.toggleRealScale)
   const setViewMode = useAppStore((s) => s.setViewMode)
 
   if (viewMode === 'body') return null
@@ -19,12 +30,30 @@ export function SceneActions() {
   return (
     <div className={styles.actions}>
       {viewMode === 'system' && (
-        // The label says what a tap will do; aria-pressed on top of a
-        // changing label would make screen readers announce it twice.
-        <button type="button" className={styles.button} onClick={toggleOrbits}>
-          {orbitsPaused ? <PlayIcon /> : <PauseIcon />}
-          {orbitsPaused ? 'Retomar' : 'Pausar'}
-        </button>
+        <>
+          {/* The label says what a tap will do; aria-pressed on top of a
+              changing label would make screen readers announce it twice.
+              On phones only the icon shows, the text stays for screen readers. */}
+          <button type="button" className={styles.button} onClick={toggleOrbits}>
+            {orbitsPaused ? <PlayIcon /> : <PauseIcon />}
+            <span className={styles.text}>{orbitsPaused ? 'Retomar' : 'Pausar'}</span>
+          </button>
+          <SegmentedControl
+            ariaLabel="Velocidade das órbitas"
+            options={SPEED_OPTIONS}
+            value={String(timeScale) as (typeof SPEED_OPTIONS)[number]['value']}
+            onChange={(value) => setTimeScale(Number(value) as TimeScale)}
+          />
+          {/* Fixed label + aria-pressed: an on/off switch, unlike Pausar. */}
+          <button
+            type="button"
+            className={styles.button}
+            aria-pressed={realScale}
+            onClick={toggleRealScale}
+          >
+            Escala real
+          </button>
+        </>
       )}
       {/* Names the body: in the comparison the selected body may be
           neither A nor B, and "Focar" alone would leave you guessing. */}

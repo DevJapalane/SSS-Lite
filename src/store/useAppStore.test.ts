@@ -60,3 +60,14 @@ describe('useAppStore', () => {
     expect(useAppStore.getState().orbitsPaused).toBe(before)
   })
 })
+
+describe('orbit controls', () => {
+  it('changes the speed and toggles real scale', () => {
+    const { setTimeScale, toggleRealScale } = useAppStore.getState()
+    expect(useAppStore.getState().realScale).toBe(false)
+    setTimeScale(100)
+    toggleRealScale()
+    expect(useAppStore.getState().timeScale).toBe(100)
+    expect(useAppStore.getState().realScale).toBe(true)
+  })
+})

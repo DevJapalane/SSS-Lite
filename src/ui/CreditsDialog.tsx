@@ -39,13 +39,13 @@ export function CreditsDialog() {
             <dt>Texturas dos corpos celestes</dt>
             <dd>Solar System Scope, licença CC BY 4.0</dd>
             <dt>Dados</dt>
-            <dd>NASA Planetary Fact Sheet e NASA Sun Fact Sheet</dd>
+            <dd>NASA Planetary Fact Sheet, Sun Fact Sheet e Moon Fact Sheet</dd>
             <dt>Fontes tipográficas</dt>
             <dd>Inter e Space Grotesk, licença SIL Open Font License</dd>
           </dl>
           <p className={styles.note}>
-            Na visão do sistema, tamanhos e distâncias estão fora de escala para que todos os
-            corpos caibam na tela.
+            Na Visão Sistema, tamanhos e distâncias ficam fora de escala para que todos os corpos
+            caibam na tela. O botão Escala real mostra as proporções verdadeiras.
           </p>
           <button type="button" className={styles.close} onClick={() => dialog.current?.close()}>
             Fechar

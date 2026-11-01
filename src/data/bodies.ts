@@ -6,7 +6,7 @@
  * the bundle avoids a network request and keeps the app light.
  */
 
-export type BodyType = 'star' | 'planet' | 'dwarf-planet'
+export type BodyType = 'star' | 'planet' | 'dwarf-planet' | 'moon'
 
 export interface CelestialBody {
   id: string

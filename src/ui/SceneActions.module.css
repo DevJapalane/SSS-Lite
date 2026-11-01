@@ -1,5 +1,7 @@
 .actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-2);
 }
 
@@ -10,6 +12,7 @@
   gap: var(--space-2);
   /* 44px minimum touch target, like the other controls. */
   min-height: 44px;
+  min-width: 44px;
   padding: 0 var(--space-4);
   font: 500 0.875rem var(--font-body);
   white-space: nowrap;
@@ -38,21 +41,45 @@
   outline-offset: 2px;
 }
 
-/* Focar is the way back to the main view: the one accented button. */
+/* Escala real switched on: outlined in the accent colour, so it reads as
+   "on" without competing with Focar. */
+.button[aria-pressed='true'] {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+/* Focar is the way back to the main view: the one filled accent button. */
 .primary {
   color: var(--color-space);
   background: var(--color-accent);
   border-color: var(--color-accent);
 }
 
-/* Phone: the row spans the screen width, both buttons share it. */
+/*
+ * Phone: two rows. Pausar shrinks to its icon so pause, speed and real scale
+ * fit on the first; Focar takes the whole second row.
+ */
 @media (max-width: 768px) {
   .actions {
     width: 100%;
   }
 
   .button {
-    flex: 1;
     padding: 0 var(--space-3);
+  }
+
+  .text {
+    /* Visually hidden, still read by screen readers. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .primary {
+    flex-basis: 100%;
   }
 }

@@ -23,6 +23,8 @@ O app funciona sem nenhum destes arquivos: cada corpo tem uma `fallbackColor` em
 | `uranus.webp` | `2k_uranus.jpg` | Urano | ~7 KB |
 | `neptune.webp` | `2k_neptune.jpg` | Netuno | ~14 KB |
 
+**Lua:** ainda sem textura (usa a cor de fallback). Para adicionar: baixar `2k_moon.jpg`, converter para `moon.webp` com os passos abaixo e preencher `texture: 'moon.webp'` em `src/data/moon.ts`.
+
 **Plutão:** o Solar System Scope não tem textura de Plutão. Por enquanto ele usa a cor de fallback. Uma alternativa futura é o mapa global da New Horizons (NASA, domínio público).
 
 **Removidas na revisão final:** `venus_surface`, `earth_clouds` e `earth_nightmap` (opcionais, ~820 KB) nunca foram usadas pelo app. Se uma versão futura usar, basta baixar e converter de novo com os passos abaixo.

@@ -6,7 +6,8 @@ Projeto acadêmico de Engenharia de Software, planejado com Scrum (backlog PB01�
 
 ## O que o app faz
 - **Visão Corpo:** um corpo por vez, grande, com textura fotográfica, girando no próprio eixo com a inclinação real.
-- **Visão Sistema:** todos os corpos em órbitas circulares simplificadas, com distâncias comprimidas e velocidade proporcional ao período real (1 ano terrestre = 20 s). Tem botões Pausar/Retomar e Focar.
+- **Visão Sistema:** todos os corpos em órbitas circulares simplificadas, com a Lua orbitando a Terra. Velocidade proporcional ao período real (1 ano terrestre = 20 s em 1×, com opções 10× e 100×) e botões Pausar/Retomar e Focar.
+- **Escala real:** por padrão a Visão Sistema comprime tamanhos e distâncias para tudo caber na tela; o botão **Escala real** mostra as proporções verdadeiras (a Lua a 30 diâmetros da Terra, Netuno a 30 vezes a distância da Terra ao Sol).
 - **Comparar:** dois corpos lado a lado **em escala real**, com frases de proporção ("O Sol é 109 vezes maior que a Terra em diâmetro") e barras de massa em escala logarítmica.
 - **Painel de dados:** raio, diâmetro, gravidade, massa e velocidade orbital, em km ou em proporção à Terra.
 - **Rótulos flutuantes** para tocar nos corpos que ficam pequenos demais na tela.
@@ -67,6 +68,6 @@ Regras e decisões do projeto: [CLAUDE.md](CLAUDE.md). Texturas: [public/texture
 
 ## Créditos
 - **Texturas dos corpos celestes:** Solar System Scope, licença CC BY 4.0.
-- **Dados:** NASA Planetary Fact Sheet e NASA Sun Fact Sheet.
+- **Dados:** NASA Planetary Fact Sheet, Sun Fact Sheet e Moon Fact Sheet.
 - **Fontes:** Inter e Space Grotesk, licença SIL Open Font License.
 - **Bibliotecas:** React, three.js, React Three Fiber, drei, Zustand e Vite, todas de código aberto (licença MIT).

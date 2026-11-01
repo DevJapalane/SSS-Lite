@@ -7,4 +7,6 @@
   border-radius: 999px;
   padding: var(--space-1) var(--space-3);
   white-space: nowrap;
+  /* Text only: taps go through to the scene. */
+  pointer-events: none;
 }

@@ -1,4 +1,3 @@
-import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { Vector3, type Group, type PerspectiveCamera } from 'three'
@@ -6,6 +5,7 @@ import type { BodyId, CelestialBody } from '../data/bodies'
 import { useAppStore } from '../store/useAppStore'
 import { projectedRadiusPx } from '../utils/cameraFraming'
 import styles from './BodyLabel.module.css'
+import { StableHtml } from './StableHtml'
 
 /**
  * On-screen radius (px) below which a body counts as "too small": at ~12 px
@@ -23,11 +23,16 @@ const HIDE_ABOVE_PX = 9
 interface Props {
   body: CelestialBody
   radius: number
+  /**
+   * Show the label whatever the body's size (system view: every body gets
+   * its name). Otherwise only when the body is too small to tap (PB07).
+   */
+  always?: boolean
 }
 
 /**
- * Floating button above a body that became too small on screen (PB07).
- * Lives inside the body's group, so it moves with the body (orbits included).
+ * Floating button above a body (PB07). Lives inside the body's group, so
+ * it moves with the body (orbits included).
  *
  * The size check runs every frame, but it never touches React state: the
  * result is written straight to the button's `hidden` attribute through a
@@ -35,7 +40,7 @@ interface Props {
  * while the camera or the planets move; drei's <Html> also moves the label
  * by writing a CSS transform directly, outside React.
  */
-export function BodyLabel({ body, radius }: Props) {
+export function BodyLabel({ body, radius, always = false }: Props) {
   const goToBody = useAppStore((s) => s.goToBody)
   const anchor = useRef<Group>(null)
   const button = useRef<HTMLButtonElement>(null)
@@ -48,16 +53,19 @@ export function BodyLabel({ body, radius }: Props) {
   useFrame(({ camera, size }) => {
     const element = button.current
     if (!anchor.current || !element) return
-    // World position, because the parent group may be orbiting. It was
-    // already moved this frame (see ORBIT_FRAME_PRIORITY).
-    anchor.current.getWorldPosition(center)
-    const px = projectedRadiusPx(
-      radius,
-      camera.position.distanceTo(center),
-      (camera as PerspectiveCamera).fov,
-      size.height,
-    )
-    const next = shown.current ? px < HIDE_ABOVE_PX : px < SHOW_BELOW_PX
+    let next = true
+    if (!always) {
+      // World position, because the parent group may be orbiting. It was
+      // already moved this frame (see ORBIT_FRAME_PRIORITY).
+      anchor.current.getWorldPosition(center)
+      const px = projectedRadiusPx(
+        radius,
+        camera.position.distanceTo(center),
+        (camera as PerspectiveCamera).fov,
+        size.height,
+      )
+      next = shown.current ? px < HIDE_ABOVE_PX : px < SHOW_BELOW_PX
+    }
     if (next === shown.current) return
     shown.current = next
     // `hidden` also removes it from Tab order and screen readers, so
@@ -68,7 +76,7 @@ export function BodyLabel({ body, radius }: Props) {
   return (
     <group ref={anchor}>
       {/* Anchored at the top of the body; CSS lifts the button above that point. */}
-      <Html position={[0, radius, 0]} zIndexRange={[2, 0]}>
+      <StableHtml position={[0, radius, 0]} zIndexRange={[2, 0]}>
         {/*
           Starts hidden; from then on only useFrame changes it. React won't
           overwrite it on re-render because the `hidden` prop never changes.
@@ -82,7 +90,7 @@ export function BodyLabel({ body, radius }: Props) {
         >
           {body.name}
         </button>
-      </Html>
+      </StableHtml>
     </group>
   )
 }

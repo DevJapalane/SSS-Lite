@@ -24,11 +24,12 @@ export default function App() {
       <div className={styles.viewControls}>
         <ViewModeSwitch />
       </div>
-      <div className={styles.notice}>
-        <ScaleNotice />
-      </div>
-      <div className={styles.actions}>
+      {/* One block for the scene controls and the scale note: when the
+          controls wrap to a second row, the note moves with them instead of
+          being covered. */}
+      <div className={styles.sceneHud}>
         <SceneActions />
+        <ScaleNotice />
       </div>
       {/* data-occludes: read by the camera to centre the scene in the space
           the side panels leave free (see scene/CameraRig.tsx). */}

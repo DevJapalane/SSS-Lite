@@ -56,23 +56,21 @@
   transform: translateX(-50%);
 }
 
-/* Bottom centre, between the side panels: Focar and pause/resume. */
-.actions {
+/* Bottom centre, between the side panels: scene controls with the scale
+   note above them (column-reverse: the note comes second in the markup). */
+.sceneHud {
   position: absolute;
   z-index: 1;
   bottom: var(--space-4);
   left: 50%;
   transform: translateX(-50%);
-}
-
-/* Just above the actions (44px buttons + a small gap). */
-.notice {
-  position: absolute;
-  z-index: 1;
-  bottom: calc(var(--space-4) + 44px + var(--space-2));
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
+  width: max-content;
+  /* Wraps instead of sliding under the side panels on a narrow desktop. */
+  max-width: calc(100% - var(--sidebar-width) - var(--panel-width) - 4 * var(--space-4));
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 /* Panels start below the top row (title and view switch, ~50px tall). */
@@ -132,19 +130,17 @@
     display: grid;
   }
 
-  /* Bottom of the screen is taken by the bar and card: the actions get a
-     full-width row under the view switch, the notice sits below them. */
-  .actions {
+  /* Bottom of the screen is taken by the bar and card: the controls get
+     full-width rows under the view switch, the note right below them. */
+  .sceneHud {
     bottom: auto;
     top: 124px;
     left: var(--space-3);
     right: var(--space-3);
+    width: auto;
+    max-width: none;
     transform: none;
-  }
-
-  .notice {
-    bottom: auto;
-    top: 178px;
+    flex-direction: column;
   }
 
   /* Over the title row: the least important strip of the screen, and the

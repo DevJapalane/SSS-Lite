@@ -80,6 +80,7 @@ const TYPE_LABELS: Record<BodyType, string> = {
   star: 'Estrela',
   planet: 'Planeta',
   'dwarf-planet': 'Planeta anão',
+  moon: 'Satélite natural',
 }
 
 export function bodyTypeLabel(type: BodyType): string {
