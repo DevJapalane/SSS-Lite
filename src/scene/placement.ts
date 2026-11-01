@@ -7,8 +7,12 @@ export interface PlacedBody {
   /** React key: in a comparison the same body may appear on both sides. */
   key: string
   body: CelestialBody
-  x: number
   radius: number
+  /**
+   * Where the body is: on its orbit (position read from the orbit clock
+   * every frame) or at a fixed X (the comparison lineup).
+   */
+  position: { kind: 'orbit' } | { kind: 'fixed'; x: number }
 }
 
 /** Which bodies the scene shows in each view, and where. */
@@ -22,12 +26,19 @@ export function placeBodies(
     const b = getBodyById(compare.b)
     const layout = computeCompareLayout(a, b)
     return [
-      { key: `a-${a.id}`, body: a, ...layout.a },
-      { key: `b-${b.id}`, body: b, ...layout.b },
+      { key: `a-${a.id}`, body: a, radius: layout.a.radius, position: { kind: 'fixed', x: layout.a.x } },
+      { key: `b-${b.id}`, body: b, radius: layout.b.radius, position: { kind: 'fixed', x: layout.b.x } },
     ]
   }
   // Body view mounts only the selected body: the others are not hidden but
   // absent, so their textures are never even requested (lazy loading for free).
+  // It stays on its orbit, where it was in the system view: focusing then
+  // just removes the others and flies the camera there, without a jump.
   const visible = viewMode === 'system' ? bodies : [getBodyById(selectedBodyId)]
-  return visible.map((body) => ({ key: body.id, body, ...systemLayout[body.id] }))
+  return visible.map((body) => ({
+    key: body.id,
+    body,
+    radius: systemLayout[body.id].radius,
+    position: { kind: 'orbit' },
+  }))
 }

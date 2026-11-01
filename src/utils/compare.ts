@@ -1,27 +1,6 @@
 import type { CelestialBody } from '../data/bodies'
 import { formatRatio } from './format'
-
-type Named = Pick<CelestialBody, 'id' | 'name'>
-
-// In pt-BR, "Sol" and "Terra" take an article ("o Sol", "a Terra"), while
-// planet names are used bare ("Júpiter", "Plutão").
-const ARTICLES: Partial<Record<string, 'o' | 'a'>> = { sun: 'o', earth: 'a' }
-
-/** "o Sol", "a Terra", "Júpiter". */
-function withArticle(body: Named): string {
-  const article = ARTICLES[body.id]
-  return article ? `${article} ${body.name}` : body.name
-}
-
-/** "do Sol", "da Terra", "de Júpiter" (de + o = do, de + a = da). */
-function ofBody(body: Named): string {
-  const article = ARTICLES[body.id]
-  return article ? `d${article} ${body.name}` : `de ${body.name}`
-}
-
-function capitalize(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1)
-}
+import { capitalize, ofBody, withArticle, type Named } from './grammar'
 
 /**
  * "109 vezes", but "1,88 vez": in Portuguese the noun stays singular below 2.

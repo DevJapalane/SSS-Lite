@@ -71,9 +71,10 @@ export function computeCompareLayout(a: CompareSource, b: CompareSource): Compar
 }
 
 /**
- * Places bodies on a line along +X, Sun at the origin.
+ * Distance of each body from the Sun in scene units (`x`, the radius of its
+ * orbit in the system view), Sun at the origin.
  *
- * Positions follow the logarithm of the real distance, so each ×10 in
+ * Distances follow the logarithm of the real distance, so each ×10 in
  * distance adds the same space: the inner planets don't collapse into the
  * Sun and Pluto doesn't end up kilometres away. When two neighbours would
  * overlap (log spacing is tight next to big bodies), the second is pushed

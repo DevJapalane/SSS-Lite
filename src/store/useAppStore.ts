@@ -12,13 +12,24 @@ interface AppState {
   viewMode: ViewMode
   unit: Unit
   compare: Record<CompareSlot, BodyId>
+  /** Whether the system view's orbits are frozen (PB13). */
+  orbitsPaused: boolean
   selectBody: (id: BodyId) => void
   /** Select a body and show it alone: what every body button does. */
   goToBody: (id: BodyId) => void
   setViewMode: (mode: ViewMode) => void
   setUnit: (unit: Unit) => void
   setCompareBody: (slot: CompareSlot, id: BodyId) => void
+  toggleOrbits: () => void
 }
+
+/**
+ * People who asked their system to reduce motion start with the orbits
+ * paused; the button still lets them play. Guarded because tests run in
+ * Node, where there is no window.
+ */
+const prefersReducedMotion =
+  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 // Global store: the 3D scene and the UI panels live in separate component
 // trees, so sharing state through a store avoids passing props through
@@ -31,11 +42,16 @@ export const useAppStore = create<AppState>()((set) => ({
   // The comparison keeps its own pair, separate from the selected body, so
   // browsing the list doesn't undo a comparison the user set up.
   compare: { a: 'sun', b: 'earth' },
+  orbitsPaused: prefersReducedMotion,
   selectBody: (id) => set({ selectedBodyId: id }),
   // Picking a body always takes you to it: in system or compare view a
   // selection with no visible effect would feel broken.
   goToBody: (id) => set({ selectedBodyId: id, viewMode: 'body' }),
+  // Only the mode changes: selection and unit live in fields of their own,
+  // so switching views (Focar included, PB10) comes back to the same body
+  // and unit.
   setViewMode: (mode) => set({ viewMode: mode }),
   setUnit: (unit) => set({ unit }),
   setCompareBody: (slot, id) => set((state) => ({ compare: { ...state.compare, [slot]: id } })),
+  toggleOrbits: () => set((state) => ({ orbitsPaused: !state.orbitsPaused })),
 }))

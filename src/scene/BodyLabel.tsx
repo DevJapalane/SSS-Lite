@@ -1,7 +1,7 @@
 import { Html } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
-import { Vector3, type PerspectiveCamera } from 'three'
+import { Vector3, type Group, type PerspectiveCamera } from 'three'
 import type { BodyId, CelestialBody } from '../data/bodies'
 import { useAppStore } from '../store/useAppStore'
 import { projectedRadiusPx } from '../utils/cameraFraming'
@@ -22,30 +22,35 @@ const HIDE_ABOVE_PX = 9
 
 interface Props {
   body: CelestialBody
-  x: number
   radius: number
 }
 
 /**
  * Floating button above a body that became too small on screen (PB07).
+ * Lives inside the body's group, so it moves with the body (orbits included).
  *
  * The size check runs every frame, but it never touches React state: the
  * result is written straight to the button's `hidden` attribute through a
  * ref, and only when it changes. React therefore doesn't re-render anything
- * while the camera moves; drei's <Html> also moves the label by writing a
- * CSS transform directly, outside React.
+ * while the camera or the planets move; drei's <Html> also moves the label
+ * by writing a CSS transform directly, outside React.
  */
-export function BodyLabel({ body, x, radius }: Props) {
+export function BodyLabel({ body, radius }: Props) {
   const goToBody = useAppStore((s) => s.goToBody)
+  const anchor = useRef<Group>(null)
   const button = useRef<HTMLButtonElement>(null)
   const shown = useRef(false)
-  // Allocated once: creating a Vector3 every frame would feed the garbage
-  // collector, whose pauses show up as stutters on phones.
-  const center = useMemo(() => new Vector3(x, 0, 0), [x])
+  // Allocated once and refilled every frame: creating a Vector3 per frame
+  // would feed the garbage collector, whose pauses show up as stutters on
+  // phones.
+  const center = useMemo(() => new Vector3(), [])
 
   useFrame(({ camera, size }) => {
     const element = button.current
-    if (!element) return
+    if (!anchor.current || !element) return
+    // World position, because the parent group may be orbiting. It was
+    // already moved this frame (see ORBIT_FRAME_PRIORITY).
+    anchor.current.getWorldPosition(center)
     const px = projectedRadiusPx(
       radius,
       camera.position.distanceTo(center),
@@ -61,21 +66,23 @@ export function BodyLabel({ body, x, radius }: Props) {
   })
 
   return (
-    // Anchored at the top of the body; CSS lifts the button above that point.
-    <Html position={[x, radius, 0]} zIndexRange={[2, 0]}>
-      {/*
-        Starts hidden; from then on only useFrame changes it. React won't
-        overwrite it on re-render because the `hidden` prop never changes.
-      */}
-      <button
-        ref={button}
-        type="button"
-        className={styles.label}
-        hidden
-        onClick={() => goToBody(body.id as BodyId)}
-      >
-        {body.name}
-      </button>
-    </Html>
+    <group ref={anchor}>
+      {/* Anchored at the top of the body; CSS lifts the button above that point. */}
+      <Html position={[0, radius, 0]} zIndexRange={[2, 0]}>
+        {/*
+          Starts hidden; from then on only useFrame changes it. React won't
+          overwrite it on re-render because the `hidden` prop never changes.
+        */}
+        <button
+          ref={button}
+          type="button"
+          className={styles.label}
+          hidden
+          onClick={() => goToBody(body.id as BodyId)}
+        >
+          {body.name}
+        </button>
+      </Html>
+    </group>
   )
 }

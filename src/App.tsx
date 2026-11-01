@@ -6,6 +6,7 @@ import { ComparePanel } from './ui/ComparePanel'
 import { CreditsDialog } from './ui/CreditsDialog'
 import { InfoPanel } from './ui/InfoPanel'
 import { ScaleNotice } from './ui/ScaleNotice'
+import { SceneActions } from './ui/SceneActions'
 import { ViewModeSwitch } from './ui/ViewModeSwitch'
 
 export default function App() {
@@ -23,6 +24,9 @@ export default function App() {
       </div>
       <div className={styles.notice}>
         <ScaleNotice />
+      </div>
+      <div className={styles.actions}>
+        <SceneActions />
       </div>
       {/* data-occludes: read by the camera to centre the scene in the space
           the side panels leave free (see scene/CameraRig.tsx). */}

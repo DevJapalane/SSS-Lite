@@ -36,4 +36,27 @@ describe('useAppStore', () => {
     expect(state.selectedBodyId).toBe('saturn')
     expect(state.viewMode).toBe('body')
   })
+
+  it('keeps the selected body and unit through system and compare (Focar, PB10)', () => {
+    const { goToBody, setUnit, setViewMode } = useAppStore.getState()
+    goToBody('jupiter')
+    setUnit('earth')
+    setViewMode('system')
+    setViewMode('compare')
+    setViewMode('body')
+    const { selectedBodyId, unit, viewMode } = useAppStore.getState()
+    expect({ selectedBodyId, unit, viewMode }).toEqual({
+      selectedBodyId: 'jupiter',
+      unit: 'earth',
+      viewMode: 'body',
+    })
+  })
+
+  it('pauses and resumes the orbits', () => {
+    const before = useAppStore.getState().orbitsPaused
+    useAppStore.getState().toggleOrbits()
+    expect(useAppStore.getState().orbitsPaused).toBe(!before)
+    useAppStore.getState().toggleOrbits()
+    expect(useAppStore.getState().orbitsPaused).toBe(before)
+  })
 })

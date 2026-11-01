@@ -1,10 +1,34 @@
 import { Stars } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
 import { useMemo } from 'react'
 import { useAppStore } from '../store/useAppStore'
 import { BodyLabel } from './BodyLabel'
 import { CameraRig } from './CameraRig'
 import { CelestialBodyMesh } from './CelestialBodyMesh'
+import { OrbitLines } from './OrbitLines'
+import { orbitClock } from './orbits'
+import { ORBIT_FRAME_PRIORITY, PlacedGroup } from './PlacedGroup'
 import { placeBodies } from './placement'
+
+/**
+ * Longest step the clock takes in one frame. Browsers stop drawing in a
+ * background tab, and the first frame back reports the whole time away as
+ * its delta; without a cap every planet would leap ahead at once.
+ */
+const MAX_STEP_SECONDS = 0.1
+
+/** Advances the orbit time while the system view is on screen. */
+function OrbitClock() {
+  useFrame((_, delta) => {
+    // getState() reads the flag without subscribing: pausing doesn't
+    // re-render anything, the next frame simply stops adding time.
+    if (!useAppStore.getState().orbitsPaused) {
+      orbitClock.time += Math.min(delta, MAX_STEP_SECONDS)
+    }
+    // Even earlier than the bodies, so they move with this frame's time.
+  }, ORBIT_FRAME_PRIORITY - 1)
+  return null
+}
 
 /** Everything inside the 3D canvas. */
 export function SolarScene() {
@@ -35,18 +59,28 @@ export function SolarScene() {
       {/* Faint fill so night sides are dark but not a black hole. */}
       <ambientLight intensity={0.12} />
 
-      {/* One draw call for 1500 points; fade blurs the edges of each star. */}
-      <Stars radius={250} depth={60} count={1500} factor={4} saturation={0} fade speed={0} />
+      {/* One draw call for 1500 points; fade blurs the edges of each star.
+          Radius past the farthest camera of the system view, so the camera
+          always stays inside the star shell. */}
+      <Stars radius={400} depth={60} count={1500} factor={4} saturation={0} fade speed={0} />
 
-      {placed.map(({ key, body, x, radius }) => (
-        <CelestialBodyMesh key={key} body={body} x={x} radius={radius} />
+      {/* Time only runs in the system view: in body view the focused body
+          holds still where it was, so the camera can rest on it. */}
+      {viewMode === 'system' && (
+        <>
+          <OrbitClock />
+          <OrbitLines />
+        </>
+      )}
+
+      {placed.map((item) => (
+        <PlacedGroup key={item.key} placed={item}>
+          <CelestialBodyMesh body={item.body} radius={item.radius} />
+          {/* Inside the moving group, so the label follows its planet.
+              In body view the one body fills the screen: no label needed. */}
+          {viewMode !== 'body' && <BodyLabel body={item.body} radius={item.radius} />}
+        </PlacedGroup>
       ))}
-
-      {/* In body view the one body fills the screen: no label needed. */}
-      {viewMode !== 'body' &&
-        placed.map(({ key, body, x, radius }) => (
-          <BodyLabel key={key} body={body} x={x} radius={radius} />
-        ))}
 
       <CameraRig />
     </>

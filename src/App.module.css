@@ -56,10 +56,20 @@
   transform: translateX(-50%);
 }
 
-.notice {
+/* Bottom centre, between the side panels: Focar and pause/resume. */
+.actions {
   position: absolute;
   z-index: 1;
   bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Just above the actions (44px buttons + a small gap). */
+.notice {
+  position: absolute;
+  z-index: 1;
+  bottom: calc(var(--space-4) + 44px + var(--space-2));
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
@@ -103,10 +113,19 @@
     display: grid;
   }
 
-  /* Bottom of the screen is taken by the bar and card; sit under the switch. */
+  /* Bottom of the screen is taken by the bar and card: the actions get a
+     full-width row under the view switch, the notice sits below them. */
+  .actions {
+    bottom: auto;
+    top: 124px;
+    left: var(--space-3);
+    right: var(--space-3);
+    transform: none;
+  }
+
   .notice {
     bottom: auto;
-    top: 126px;
+    top: 178px;
   }
 
   .list {

@@ -7,14 +7,19 @@ import { useAppStore, type CompareSlot, type ViewMode } from '../store/useAppSto
 import { MOBILE_QUERY, useMediaQuery } from '../ui/useMediaQuery'
 import { lineupFitDistance, sphereFitDistance } from '../utils/cameraFraming'
 import { computeCompareLayout } from '../utils/scale'
-import { lineupBounds, systemLayout } from './systemLayout'
+import { orbitAngle, writeOrbitPosition } from './orbits'
+import { sunRadius, systemLayout, systemRadius } from './systemLayout'
 
 const { ACTION } = CameraControlsImpl
+const UP = new Vector3(0, 1, 0)
 
-// The Sun sits at -X, so looking slightly from that side shows mostly the
-// lit hemisphere with the day/night line near the edge.
+// For a body at angle 0 (on +X, Sun at -X): looking slightly from the Sun's
+// side shows mostly the lit hemisphere with the day/night line near the edge.
+// Rotated by the body's orbit angle, it gives the same picture anywhere.
 const BODY_VIEW_DIRECTION = new Vector3(-0.45, 0.25, 1).normalize()
-const SYSTEM_VIEW_DIRECTION = new Vector3(0, 0.35, 1).normalize()
+// ~29° above the orbit plane: high enough to read the orbits as circles,
+// low enough to still feel like looking at planets rather than a map.
+const SYSTEM_VIEW_DIRECTION = new Vector3(0, 0.55, 1).normalize()
 // Nearly head-on: seen from the side, perspective would make the nearer
 // body look bigger and distort the real-scale comparison.
 const COMPARE_VIEW_DIRECTION = new Vector3(0, 0.12, 1).normalize()
@@ -51,26 +56,32 @@ function planShot(
   }
 
   if (viewMode === 'system') {
-    const distance = lineupFitDistance(lineupBounds.width, lineupBounds.height, fov, aspect)
+    // The orbit disc seen from above at an angle: as wide as its diameter,
+    // as tall as its foreshortened depth (plus the Sun sticking out of it).
+    const elevation = Math.asin(SYSTEM_VIEW_DIRECTION.y)
+    const width = 2 * systemRadius
+    const height = width * Math.sin(elevation) + 2 * sunRadius
+    const distance = lineupFitDistance(width, height, fov, aspect)
     return {
-      target: new Vector3(lineupBounds.centerX, 0, 0),
+      target: new Vector3(0, 0, 0),
       direction: SYSTEM_VIEW_DIRECTION,
       distance,
       minDistance: 2,
-      maxDistance: distance * 2,
-      // Panning lets you slide along the lineup, essential on a narrow phone.
+      maxDistance: distance * 1.6,
+      // Panning lets you slide to a corner of the system, essential on a
+      // narrow phone.
       allowPan: true,
     }
   }
 
-  // 'body': one body, centred.
+  // 'body': one body, centred, wherever its orbit left it.
   const body = getBodyById(bodyId)
-  const { x, radius } = systemLayout[body.id]
+  const { radius } = systemLayout[body.id]
   // Frame the rings too, otherwise Saturn's would be cut off.
   const distance = sphereFitDistance(radius * (body.rings?.outerRadiusRatio ?? 1), fov, aspect)
   return {
-    target: new Vector3(x, 0, 0),
-    direction: BODY_VIEW_DIRECTION,
+    target: writeOrbitPosition(bodyId, new Vector3()),
+    direction: BODY_VIEW_DIRECTION.clone().applyAxisAngle(UP, orbitAngle(bodyId)),
     distance,
     // Limits relative to the body: never so close it fills the whole screen
     // (on a narrow phone that already happens well before touching the

@@ -10,18 +10,18 @@ import { SunGlow } from './SunGlow'
 
 interface Props {
   body: CelestialBody
-  x: number
   radius: number
 }
 
 /**
  * Any body of the system, driven only by its data entry.
  *
- * Nesting: position group → tilt group → spinning sphere. Splitting tilt and
- * spin into separate objects means the spin always happens around the tilted
- * axis; rotating one object on two axes would wobble instead.
+ * Nesting: tilt group → spinning sphere; the parent PlacedGroup moves it.
+ * Splitting tilt and spin into separate objects means the spin always
+ * happens around the tilted axis; rotating one object on two axes would
+ * wobble instead.
  */
-export function CelestialBodyMesh({ body, x, radius }: Props) {
+export function CelestialBodyMesh({ body, radius }: Props) {
   const sphere = useRef<Mesh>(null)
   const speed = spinSpeed(body)
 
@@ -32,7 +32,7 @@ export function CelestialBodyMesh({ body, x, radius }: Props) {
   })
 
   return (
-    <group position-x={x}>
+    <>
       {/*
         Tipping the north pole toward -X (the Sun's side) opens Saturn's rings
         toward the body-view camera; tipping the other way leaves them almost
@@ -49,6 +49,6 @@ export function CelestialBodyMesh({ body, x, radius }: Props) {
         )}
       </group>
       {body.type === 'star' && <SunGlow radius={radius} />}
-    </group>
+    </>
   )
 }
