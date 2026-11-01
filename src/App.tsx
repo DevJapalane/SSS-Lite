@@ -17,7 +17,7 @@ export default function App() {
     <div className={styles.layout}>
       <header className={styles.header}>
         <h1 className={styles.title}>
-          SSS <span className={styles.accent}>Lite</span>
+          Solar System Simulator <span className={styles.accent}>Lite</span>
         </h1>
         <CreditsDialog />
       </header>
@@ -42,6 +42,9 @@ export default function App() {
       <div className={styles.panel} data-occludes="right">
         {isComparing ? <ComparePanel /> : <InfoPanel />}
       </div>
+      {/* Authorship mark: always on screen, small and faint, and it never
+          catches taps meant for the scene. */}
+      <p className={styles.watermark}>Projeto SSS Lite por Kalane Maciel</p>
       {/* Last in the markup and above everything else: transient messages. */}
       <div className={styles.alerts}>
         <ConnectionNotice />

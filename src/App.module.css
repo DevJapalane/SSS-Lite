@@ -48,6 +48,28 @@
   color: var(--color-accent);
 }
 
+/*
+ * Bottom centre, in the strip below the scene controls (desktop) or below
+ * the bar of bodies (phone): visible in every view without covering
+ * anything. Low contrast so it reads as a signature, not as content.
+ */
+.watermark {
+  position: absolute;
+  z-index: 1;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 14px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+  pointer-events: none;
+  user-select: none;
+}
+
 .viewControls {
   position: absolute;
   z-index: 1;
@@ -112,11 +134,36 @@
   pointer-events: auto;
 }
 
+/*
+ * Narrow desktop / tablet: the full name would run into the centred view
+ * switch, so the switch moves to the top-right corner (the info panel
+ * starts below it).
+ */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .viewControls {
+    left: auto;
+    right: var(--space-4);
+    transform: none;
+  }
+}
+
 /* Phone: list becomes a bottom bar, info panel a bottom card above it. */
 @media (max-width: 768px) {
   .header {
     left: var(--space-3);
     gap: 0;
+  }
+
+  /* The full name doesn't fit beside "Créditos" at title size on a phone. */
+  .title {
+    font-size: 1rem;
+  }
+
+  /* Under the bar of bodies, above the iPhone home indicator. */
+  .watermark {
+    bottom: env(safe-area-inset-bottom);
+    font-size: 0.625rem;
+    line-height: 12px;
   }
 
   /* Three view buttons don't fit beside the title on a phone: they get a

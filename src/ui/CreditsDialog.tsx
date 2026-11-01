@@ -36,6 +36,13 @@ export function CreditsDialog() {
             Créditos
           </h2>
           <dl className={styles.list}>
+            <dt>Projeto</dt>
+            <dd>
+              Desenhado por Kalane Maciel, estudante de Engenharia de Software, como aplicativo
+              de aula prática
+            </dd>
+            <dt>Desenvolvimento</dt>
+            <dd>Claude Code, utilizado para acelerar o processo de desenvolvimento</dd>
             <dt>Texturas dos corpos celestes</dt>
             <dd>Solar System Scope, licença CC BY 4.0</dd>
             <dt>Dados</dt>
