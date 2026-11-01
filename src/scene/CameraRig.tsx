@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { PerspectiveCamera, Vector3 } from 'three'
 import { getBodyById, type BodyId } from '../data/bodies'
 import { useAppStore, type CompareSlot, type ViewMode } from '../store/useAppStore'
-import { MOBILE_QUERY, useMediaQuery } from '../ui/useMediaQuery'
+import { MOBILE_QUERY, REDUCED_MOTION_QUERY, useMediaQuery } from '../ui/useMediaQuery'
 import { lineupFitDistance, sphereFitDistance } from '../utils/cameraFraming'
 import { computeCompareLayout } from '../utils/scale'
 import { orbitAngle, writeOrbitPosition } from './orbits'
@@ -123,6 +123,9 @@ export function CameraRig() {
   const compare = useAppStore((s) => s.compare)
   // On phones the panels sit at the bottom, so nothing covers the sides.
   const isMobile = useMediaQuery(MOBILE_QUERY)
+  // A long camera flight is exactly the kind of large on-screen motion this
+  // setting asks to avoid: cut straight to the new shot instead.
+  const reduceMotion = useMediaQuery(REDUCED_MOTION_QUERY)
   // Increments on every new flight so an old flight that finishes late
   // can't apply its limits on top of the current one.
   const flightId = useRef(0)
@@ -160,13 +163,13 @@ export function CameraRig() {
     const position = shot.direction.clone().multiplyScalar(shot.distance).add(shot.target)
     // Resolves when the flight ends (or the user interrupts it by dragging).
     void c
-      .setLookAt(position.x, position.y, position.z, shot.target.x, shot.target.y, shot.target.z, true)
+      .setLookAt(position.x, position.y, position.z, shot.target.x, shot.target.y, shot.target.z, !reduceMotion)
       .then(() => {
         if (id !== flightId.current) return
         c.minDistance = shot.minDistance
         c.maxDistance = shot.maxDistance
       })
-  }, [viewMode, selectedBodyId, compare, camera, getState])
+  }, [viewMode, selectedBodyId, compare, camera, getState, reduceMotion])
 
   return (
     <CameraControls

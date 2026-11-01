@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { BodyId } from '../data/bodies'
+import { REDUCED_MOTION_QUERY } from '../ui/useMediaQuery'
 
 export type ViewMode = 'body' | 'system' | 'compare'
 /** How sizes are shown: absolute km or relative to Earth (Terra = 1). */
@@ -14,7 +15,6 @@ interface AppState {
   compare: Record<CompareSlot, BodyId>
   /** Whether the system view's orbits are frozen (PB13). */
   orbitsPaused: boolean
-  selectBody: (id: BodyId) => void
   /** Select a body and show it alone: what every body button does. */
   goToBody: (id: BodyId) => void
   setViewMode: (mode: ViewMode) => void
@@ -29,7 +29,7 @@ interface AppState {
  * Node, where there is no window.
  */
 const prefersReducedMotion =
-  typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  typeof window !== 'undefined' && window.matchMedia(REDUCED_MOTION_QUERY).matches
 
 // Global store: the 3D scene and the UI panels live in separate component
 // trees, so sharing state through a store avoids passing props through
@@ -43,7 +43,6 @@ export const useAppStore = create<AppState>()((set) => ({
   // browsing the list doesn't undo a comparison the user set up.
   compare: { a: 'sun', b: 'earth' },
   orbitsPaused: prefersReducedMotion,
-  selectBody: (id) => set({ selectedBodyId: id }),
   // Picking a body always takes you to it: in system or compare view a
   // selection with no visible effect would feel broken.
   goToBody: (id) => set({ selectedBodyId: id, viewMode: 'body' }),

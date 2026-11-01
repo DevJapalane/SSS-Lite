@@ -2,10 +2,18 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#05070d" />
-    <meta name="description" content="Visualização 3D leve do Sistema Solar." />
+    <meta name="description" content="Visualização 3D leve do Sistema Solar: o Sol, os 8 planetas e Plutão." />
+    <!-- iOS ignores most of the manifest: name and status bar come from here.
+         "black" (not "black-translucent") keeps the page below the status
+         bar, so no safe-area padding is needed at the top. -->
+    <meta name="apple-mobile-web-app-title" content="SSS Lite" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>SSS Lite</title>
   </head>
   <body>

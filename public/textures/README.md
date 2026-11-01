@@ -15,10 +15,7 @@ O app funciona sem nenhum destes arquivos: cada corpo tem uma `fallbackColor` em
 | `sun.webp` | `2k_sun.jpg` | Sol | ~197 KB |
 | `mercury.webp` | `2k_mercury.jpg` | Mercúrio | ~403 KB |
 | `venus_atmosphere.webp` | `2k_venus_atmosphere.jpg` | Vênus (visual padrão, com nuvens) | ~31 KB |
-| `venus_surface.webp` | `2k_venus_surface.jpg` | Vênus, superfície (opcional) | ~279 KB |
 | `earth_daymap.webp` | `2k_earth_daymap.jpg` | Terra | ~129 KB |
-| `earth_clouds.webp` | `2k_earth_clouds.jpg` | Camada de nuvens da Terra (opcional) | ~474 KB |
-| `earth_nightmap.webp` | `2k_earth_nightmap.jpg` | Luzes noturnas da Terra (opcional) | ~64 KB |
 | `mars.webp` | `2k_mars.jpg` | Marte | ~190 KB |
 | `jupiter.webp` | `2k_jupiter.jpg` | Júpiter | ~101 KB |
 | `saturn.webp` | `2k_saturn.jpg` | Saturno | ~27 KB |
@@ -28,7 +25,9 @@ O app funciona sem nenhum destes arquivos: cada corpo tem uma `fallbackColor` em
 
 **Plutão:** o Solar System Scope não tem textura de Plutão. Por enquanto ele usa a cor de fallback. Uma alternativa futura é o mapa global da New Horizons (NASA, domínio público).
 
-Os opcionais só devem ser carregados se a etapa correspondente do backlog os usar. As texturas são carregadas sob demanda e ficam fora do precache do service worker (`vite.config.ts` → `globIgnores`).
+**Removidas na revisão final:** `venus_surface`, `earth_clouds` e `earth_nightmap` (opcionais, ~820 KB) nunca foram usadas pelo app. Se uma versão futura usar, basta baixar e converter de novo com os passos abaixo.
+
+As texturas são carregadas sob demanda, e o service worker não guarda nada em cache (o app é apenas online).
 
 ## Como converter para WebP
 

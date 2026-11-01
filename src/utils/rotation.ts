@@ -26,7 +26,11 @@ export function axialTiltRad(body: Pick<CelestialBody, 'axialTiltDeg'>): number 
   return (body.axialTiltDeg * Math.PI) / 180
 }
 
-/** True when the body's spin looks clockwise seen from the orbit's north. */
+/**
+ * True when the body's spin looks clockwise seen from the orbit's north.
+ * Not used by the UI: the tests use it to check that the tilts in the data
+ * agree with the retrograde (negative) periods of the fact sheet.
+ */
 export function isRetrogradeSpin(body: Pick<CelestialBody, 'axialTiltDeg'>): boolean {
   // The spin axis' vertical component is cos(tilt); below zero it points "down".
   return Math.cos(axialTiltRad(body)) < 0

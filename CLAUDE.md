@@ -42,6 +42,9 @@ public/textures  texturas WebP
 - `npm run dev` – servidor de desenvolvimento
 - `npm run build` – checagem de tipos + build de produção
 - `npm test` – testes (Vitest)
+- `npm run lint` – lint (oxlint)
+- `npm run preview` – serve o build (o service worker só existe no build)
+- `npm run icons` – regenera os ícones PWA a partir de `public/favicon.svg`
 
 ## Como trabalhar comigo (IMPORTANTE)
 Sou estudante de Engenharia de Software e quero APRENDER com este projeto. Por isso:

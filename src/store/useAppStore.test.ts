@@ -12,8 +12,8 @@ describe('useAppStore', () => {
   })
 
   it('updates through its actions', () => {
-    const { selectBody, setViewMode, setUnit } = useAppStore.getState()
-    selectBody('mars')
+    const { goToBody, setViewMode, setUnit } = useAppStore.getState()
+    goToBody('mars')
     setViewMode('system')
     setUnit('earth')
     const state = useAppStore.getState()

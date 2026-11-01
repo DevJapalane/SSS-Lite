@@ -11,6 +11,8 @@
   /* Translucent panels */
   --color-surface: rgba(16, 22, 36, 0.55);
   --color-surface-strong: rgba(16, 22, 36, 0.8);
+  /* Messages that float over other controls must stay readable on top of them. */
+  --color-surface-solid: rgba(12, 17, 28, 0.96);
   --color-border: rgba(255, 255, 255, 0.12);
   --blur-panel: 12px;
 

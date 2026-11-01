@@ -95,6 +95,25 @@
   flex-direction: column;
 }
 
+/* Messages (offline, install tip): top centre, between the side panels. */
+.alerts {
+  position: absolute;
+  z-index: 2;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 2 * var(--space-4)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  /* Empty most of the time: never block taps on the scene below. */
+  pointer-events: none;
+}
+
+.alerts > * {
+  pointer-events: auto;
+}
+
 /* Phone: list becomes a bottom bar, info panel a bottom card above it. */
 @media (max-width: 768px) {
   .header {
@@ -126,6 +145,16 @@
   .notice {
     bottom: auto;
     top: 178px;
+  }
+
+  /* Over the title row: the least important strip of the screen, and the
+     tip is dismissible. */
+  .alerts {
+    top: var(--space-3);
+    left: var(--space-3);
+    right: var(--space-3);
+    width: auto;
+    transform: none;
   }
 
   .list {

@@ -18,3 +18,6 @@ export function useMediaQuery(query: string): boolean {
 
 /** Same breakpoint as the CSS (`max-width: 768px`). */
 export const MOBILE_QUERY = '(max-width: 768px)'
+
+/** Set in the OS accessibility settings by people sensitive to motion. */
+export const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'

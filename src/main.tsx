@@ -9,9 +9,8 @@ import './styles/theme.css'
 import App from './App.tsx'
 import { useAppStore } from './store/useAppStore'
 
-// Dev-only handle to drive the app from the browser console while the
-// selection UI doesn't exist, e.g. `sss.getState().selectBody('saturn')`.
-// Stripped from production builds.
+// Dev-only handle to drive the app from the browser console, e.g.
+// `sss.getState().goToBody('saturn')`. Stripped from production builds.
 if (import.meta.env.DEV) {
   Object.assign(window, { sss: useAppStore })
 }
