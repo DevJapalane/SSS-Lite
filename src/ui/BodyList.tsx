@@ -1,8 +1,19 @@
 import { useRef, type CSSProperties, type KeyboardEvent } from 'react'
-import { bodies } from '../data/bodies'
+import { bodies, type CelestialBody } from '../data/bodies'
 import { useAppStore } from '../store/useAppStore'
 import { BodyBadge } from './BodyBadge'
 import styles from './BodyList.module.css'
+
+/**
+ * Tiny texture copies made by `npm run thumbs` (1–3 KB each), not the full
+ * textures: those would download ~1 MB as soon as the list appears.
+ */
+function swatchStyle(body: CelestialBody): CSSProperties {
+  const thumb = body.texture
+    ? `url(${import.meta.env.BASE_URL}textures/thumbs/${body.texture})`
+    : undefined
+  return { '--swatch': body.fallbackColor, '--thumb': thumb } as CSSProperties
+}
 
 /**
  * Buttons for every body: the side list on desktop, the bottom bar on
@@ -50,9 +61,9 @@ export function BodyList() {
             >
               <span
                 className={styles.swatch}
-                // CSS custom property: one stylesheet rule draws every swatch,
-                // only the color comes from the data.
-                style={{ '--swatch': body.fallbackColor } as CSSProperties}
+                // CSS custom properties: one stylesheet rule draws every
+                // swatch, only the colour and thumbnail come from the data.
+                style={swatchStyle(body)}
                 aria-hidden="true"
               />
               <span className={styles.name}>{body.name}</span>

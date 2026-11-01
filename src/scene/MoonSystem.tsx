@@ -3,8 +3,8 @@ import { useMemo, useRef } from 'react'
 import { Vector3, type Group } from 'three'
 import { moon } from '../data/moon'
 import labelStyles from './BodyLabel.module.css'
-import { BodyMaterial } from './BodyMaterial'
-import { orbitLineMaterial, unitCircle, unitSphere } from './geometries'
+import { CelestialBodyMesh } from './CelestialBodyMesh'
+import { orbitLineMaterial, unitCircle } from './geometries'
 import { moonAngle, writeCirclePoint } from './orbits'
 import { ORBIT_FRAME_PRIORITY } from './PlacedGroup'
 import { StableHtml } from './StableHtml'
@@ -35,12 +35,7 @@ export function MoonSystem({ realScale }: { realScale: boolean }) {
 
   useFrame(() => {
     if (!body.current) return
-    const angle = moonAngle()
-    writeCirclePoint(angle, orbitRadius, body.current.position)
-    // Tidal locking: turning exactly once per orbit keeps the same face
-    // toward Earth, as the real Moon does. +π because a sphere's texture is
-    // centred on +X and the near side has to face -X (toward Earth).
-    body.current.rotation.y = angle + Math.PI
+    writeCirclePoint(moonAngle(), orbitRadius, body.current.position)
   }, ORBIT_FRAME_PRIORITY)
 
   useFrame(({ camera, size }) => {
@@ -62,9 +57,13 @@ export function MoonSystem({ realScale }: { realScale: boolean }) {
     <group ref={origin}>
       <lineLoop geometry={unitCircle} material={orbitLineMaterial} scale={orbitRadius} />
       <group ref={body}>
-        <mesh geometry={unitSphere} scale={radius}>
-          <BodyMaterial body={moon} />
-        </mesh>
+        {/*
+          Spins on its own axis like every other body, in every view. The
+          real Moon is tidally locked (one turn per orbit, same face toward
+          Earth), but here the orbit stops in body view and takes only 1,5 s
+          in the system view, so a locked Moon looked like it never turned.
+        */}
+        <CelestialBodyMesh body={moon} radius={radius} />
         <StableHtml position={[0, radius, 0]} zIndexRange={[2, 0]}>
           {/* A tag, not a button: the Moon isn't one of the selectable
               bodies (it stays out of the list and the panel). */}

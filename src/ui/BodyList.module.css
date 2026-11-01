@@ -55,18 +55,25 @@
   outline-offset: 1px;
 }
 
-/* Small sphere: a gradient fakes light from the upper left. */
+/*
+ * Small sphere: the body's texture thumbnail (or its colour, for Pluto)
+ * under a gradient that fakes light from the upper left, so the flat image
+ * reads as a ball.
+ */
 .swatch {
   flex-shrink: 0;
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 35% 30%,
-    color-mix(in srgb, var(--swatch) 60%, white),
-    var(--swatch) 45%,
-    color-mix(in srgb, var(--swatch) 45%, black)
-  );
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(255, 255, 255, 0.28),
+      transparent 42%,
+      rgba(0, 0, 0, 0.55) 100%
+    ),
+    var(--thumb, none) center / cover,
+    var(--swatch);
 }
 
 .name {

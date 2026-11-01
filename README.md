@@ -1,73 +1,71 @@
 # SSS Lite
 
-**Solar System Simulator Lite**: um app web leve para ver o Sistema Solar em 3D, direto no navegador do celular ou do computador. Mostra o Sol, os 8 planetas e Plutão (planeta anão).
+### O Sistema Solar inteiro, em 3D, na palma da sua mão.
 
-Projeto acadêmico de Engenharia de Software, planejado com Scrum (backlog PB01–PB13).
+**SSS Lite** (Solar System Simulator Lite) é um aplicativo web que transforma qualquer celular ou computador numa janela para o Sistema Solar. O Sol, os oito planetas, Plutão e a Lua aparecem em 3D, com texturas fotográficas e dados oficiais da NASA, direto no navegador: sem baixar nada da loja e sem precisar de um computador potente.
 
-## O que o app faz
-- **Visão Corpo:** um corpo por vez, grande, com textura fotográfica, girando no próprio eixo com a inclinação real.
-- **Visão Sistema:** todos os corpos em órbitas circulares simplificadas, com a Lua orbitando a Terra. Velocidade proporcional ao período real (1 ano terrestre = 20 s em 1×, com opções 10× e 100×) e botões Pausar/Retomar e Focar.
-- **Escala real:** por padrão a Visão Sistema comprime tamanhos e distâncias para tudo caber na tela; o botão **Escala real** mostra as proporções verdadeiras (a Lua a 30 diâmetros da Terra, Netuno a 30 vezes a distância da Terra ao Sol).
-- **Comparar:** dois corpos lado a lado **em escala real**, com frases de proporção ("O Sol é 109 vezes maior que a Terra em diâmetro") e barras de massa em escala logarítmica.
-- **Painel de dados:** raio, diâmetro, gravidade, massa e velocidade orbital, em km ou em proporção à Terra.
-- **Rótulos flutuantes** para tocar nos corpos que ficam pequenos demais na tela.
-- **Instalável (PWA):** pode ser adicionado à tela inicial do Android, do iOS e do desktop. Funciona **apenas online**.
+---
 
-## Stack
-- React 19 + TypeScript + Vite
-- React Three Fiber + drei (three.js)
-- Zustand (estado global)
-- CSS Modules com variáveis de tema (sem framework de UI)
-- vite-plugin-pwa (manifesto e service worker mínimo)
-- Vitest (testes) e oxlint (lint)
+## Para quem é
 
-## Como rodar
-Pré-requisito: Node.js 20 ou mais novo.
+- **Estudantes:** veja de verdade o que os livros só descrevem: o tamanho de Júpiter perto da Terra, os anéis de Saturno, Urano girando "deitado".
+- **Professores:** um recurso visual pronto para a sala de aula, que roda no projetor, no notebook ou no celular dos alunos.
+- **Curiosos de todas as idades:** explore o espaço no seu ritmo, com informações claras em português.
 
-```bash
-npm install
-npm run dev        # servidor de desenvolvimento (http://localhost:5173)
-npm run dev:host   # o mesmo, acessível pelo celular na mesma rede Wi-Fi
-npm test           # testes
-npm run lint       # lint
-npm run build      # checagem de tipos + build de produção (pasta dist/)
-npm run preview    # serve o build localmente
-npm run icons      # regenera os ícones a partir de public/favicon.svg
-```
+## Recursos
 
-## Publicar na Vercel (via GitHub)
-O repositório já tem o `vercel.json`. O build é `npm run build` e a saída fica em `dist`. Para publicar com a conta **DevJapalane**:
+### Explore cada mundo de perto
+Escolha qualquer corpo celeste e ele aparece grande, centralizado e girando no próprio eixo, com a inclinação real. Gire com o dedo, aproxime com pinça e descubra os detalhes de cada superfície.
 
-1. Confira que o código está no GitHub: `git push` para a branch `master` de `DevJapalane/SSS-Lite`.
-2. Acesse o site da Vercel e entre com **Continue with GitHub**, usando a conta DevJapalane.
-3. Clique em **Add New… → Project**.
-4. Na lista de repositórios, encontre **SSS-Lite** e clique em **Import**. Se ele não aparecer, clique em **Adjust GitHub App Permissions** e libere o acesso a esse repositório.
-5. Na tela de configuração, deixe como está: Framework Preset **Vite**, Build Command `npm run build`, Output Directory `dist`. Não há variáveis de ambiente.
-6. Clique em **Deploy**. Em cerca de 1 minuto sai um endereço `https://….vercel.app`.
-7. A partir daí, **cada `git push` na `master` publica uma nova versão** automaticamente. Pushes em outras branches geram endereços de pré-visualização.
+### Veja o Sistema Solar em movimento
+Na Visão Sistema, os planetas orbitam o Sol, com a Lua acompanhando a Terra. Cada um se move na velocidade proporcional ao seu ano real: Mercúrio dispara, Netuno caminha devagar. Pause quando quiser ou acelere o tempo em 10× e 100×.
 
-**Depois de publicar, teste no celular:**
-- **Android (Chrome):** menu ⋮ → **Instalar app** (ou **Adicionar à tela inicial**).
-- **iOS (Safari):** o próprio app mostra uma dica: **Compartilhar → Adicionar à Tela de Início**.
+### Escala real, sem truques
+Com um toque em **Escala real**, tamanhos e distâncias passam a ser os verdadeiros. É aí que se entende o quanto o espaço é vazio: a Lua fica a 30 diâmetros da Terra, e Netuno está 30 vezes mais longe do Sol que nós.
 
-A instalação só funciona em HTTPS. A Vercel já entrega HTTPS; em `localhost` o navegador também permite.
+### Compare dois corpos lado a lado
+Coloque o Sol ao lado de Plutão, ou Júpiter ao lado da Terra, na proporção exata. O app traduz em frases simples, como "O Sol é 109 vezes maior que a Terra em diâmetro", e mostra a diferença de massa num gráfico fácil de ler.
 
-## Estrutura
-```
-src/data      dados fixos dos corpos (NASA)
-src/scene     tudo que é 3D (React Three Fiber)
-src/ui        interface 2D (lista, painéis, botões)
-src/store     estado global (Zustand)
-src/styles    tema e variáveis CSS
-src/utils     funções puras (formatação, escalas, frases), cobertas por testes
-src/sw.ts     service worker mínimo (sem cache)
-public/       ícones e texturas
-```
+### Números que fazem sentido
+Raio, diâmetro, gravidade, massa e velocidade orbital de cada corpo, em quilômetros ou em comparação com a Terra ("Júpiter tem 318 vezes a massa da Terra"). Tudo no formato brasileiro.
 
-Regras e decisões do projeto: [CLAUDE.md](CLAUDE.md). Texturas: [public/textures/README.md](public/textures/README.md).
+### Nunca perca um planeta de vista
+Cada corpo tem uma etiqueta com o nome, e basta tocar nela para ir até ele, mesmo quando o planeta é só um ponto na tela.
+
+### Instale como um app
+Adicione o SSS Lite à tela inicial do Android, do iPhone ou do computador. Ele abre em tela cheia, com ícone próprio, como qualquer aplicativo.
+
+## Por que SSS Lite
+
+| | |
+|---|---|
+| **Leve de verdade** | Feito para rodar liso em celulares intermediários. As texturas só carregam quando você precisa delas. |
+| **Dados confiáveis** | Valores baseados nas fichas oficiais da NASA para os planetas, o Sol e a Lua. |
+| **Sem instalação obrigatória** | Abra no navegador e comece a explorar. Instalar na tela inicial é opcional. |
+| **Feito em português** | Interface, textos e números pensados para quem fala português do Brasil. |
+| **Acessível** | Funciona com teclado e leitores de tela, e respeita quem prefere menos movimento na tela. |
+| **Honesto com a escala** | O app sempre avisa quando os tamanhos estão comprimidos para caber na tela, e quando estão em escala real. |
+
+## Como acessar
+
+Abra o SSS Lite no navegador do celular ou do computador. Para tê-lo sempre à mão:
+- **Android (Chrome):** menu ⋮ → **Instalar app**.
+- **iPhone e iPad (Safari):** **Compartilhar** → **Adicionar à Tela de Início**. O próprio app mostra essa dica.
+- **Computador (Chrome ou Edge):** ícone de instalação na barra de endereço.
+
+O SSS Lite precisa de internet para carregar as imagens dos planetas.
+
+## Tecnologia
+
+Construído com React, TypeScript e three.js (via React Three Fiber), como um app web progressivo (PWA).
 
 ## Créditos
+
 - **Texturas dos corpos celestes:** Solar System Scope, licença CC BY 4.0.
 - **Dados:** NASA Planetary Fact Sheet, Sun Fact Sheet e Moon Fact Sheet.
 - **Fontes:** Inter e Space Grotesk, licença SIL Open Font License.
-- **Bibliotecas:** React, three.js, React Three Fiber, drei, Zustand e Vite, todas de código aberto (licença MIT).
+- **Bibliotecas de código aberto:** React, three.js, React Three Fiber, drei, Zustand e Vite.
+
+---
+
+*SSS Lite nasceu como um projeto acadêmico de Engenharia de Software, planejado com Scrum.*

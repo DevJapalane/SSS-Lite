@@ -13,8 +13,8 @@ export const EARTH_YEAR_SCREEN_SECONDS = 20
  * visibly crawl, which is exactly the real contrast. Faster would turn
  * Mercury into a blur; slower would leave everything past Mars looking still.
  *
- * Kept separate from the spin TIME_SCALE (3600): at this factor Earth would
- * spin ~18 times per second, which reads as flicker, not rotation.
+ * Kept separate from the spin rate (Earth turns in 24 s): at this factor
+ * Earth would spin ~18 times per second, which reads as flicker, not rotation.
  */
 export const ORBIT_TIME_SCALE = (365.25 * SECONDS_PER_DAY) / EARTH_YEAR_SCREEN_SECONDS
 

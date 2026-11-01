@@ -45,6 +45,9 @@ public/textures  texturas WebP
 - `npm run lint` – lint (oxlint)
 - `npm run preview` – serve o build (o service worker só existe no build)
 - `npm run icons` – regenera os ícones PWA a partir de `public/favicon.svg`
+- `npm run thumbs` – regenera as miniaturas da lista (`public/textures/thumbs/`) a partir das texturas
+
+O README.md é a apresentação pública do produto: sem instruções de desenvolvimento e sem mencionar a hospedagem. Comandos e regras de desenvolvimento ficam aqui.
 
 ## Como trabalhar comigo (IMPORTANTE)
 Sou estudante de Engenharia de Software e quero APRENDER com este projeto. Por isso:

@@ -1,17 +1,26 @@
 import type { CelestialBody } from '../data/bodies'
 
+/** Screen seconds for one turn of Earth: slow enough to read the continents. */
+export const EARTH_SPIN_SCREEN_SECONDS = 24
+
+const EARTH_DAY_HOURS = 23.9
+
 /**
- * Simulated seconds per real second: 1 hour of the body's day = 1 second on
- * screen. Earth (23.9 h) turns once every ~24 s — slow enough to read the
- * continents, fast enough to notice it spinning. Jupiter takes ~10 s, the
- * Sun ~10 min and Venus ~97 min (it really is that slow).
+ * Screen seconds for one turn of the body on its own axis.
+ *
+ * Real days span ~590× (Jupiter 9,9 h to Venus 5.832 h). At a single
+ * proportional rate, the one that keeps Earth readable, Venus would take
+ * 97 min per turn and the Sun 10 min: they would look frozen. A cube root
+ * of the ratio to Earth (as in the sizes) shrinks that span to ~8× while
+ * keeping the order: Jupiter ~18 s, Earth 24 s, Venus ~2,5 min.
  */
-export const TIME_SCALE = 3600
+export function spinPeriodScreenSeconds(body: Pick<CelestialBody, 'rotationPeriodHours'>): number {
+  return EARTH_SPIN_SCREEN_SECONDS * Math.cbrt(Math.abs(body.rotationPeriodHours) / EARTH_DAY_HOURS)
+}
 
 /** Spin speed in radians per real second (always positive). */
 export function spinSpeed(body: Pick<CelestialBody, 'rotationPeriodHours'>): number {
-  const periodSeconds = (Math.abs(body.rotationPeriodHours) * 3600) / TIME_SCALE
-  return (2 * Math.PI) / periodSeconds
+  return (2 * Math.PI) / spinPeriodScreenSeconds(body)
 }
 
 /**

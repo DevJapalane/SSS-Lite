@@ -30,6 +30,8 @@ O app funciona sem nenhum destes arquivos: cada corpo tem uma `fallbackColor` em
 
 **Removidas na revisão final:** `venus_surface`, `earth_clouds` e `earth_nightmap` (opcionais, ~820 KB) nunca foram usadas pelo app. Se uma versão futura usar, basta baixar e converter de novo com os passos abaixo.
 
+**Miniaturas da lista:** `thumbs/` guarda cópias de 96×48 px (0,1–1,3 KB cada) usadas nas bolinhas da lista de corpos. Depois de trocar ou adicionar uma textura, rode `npm run thumbs`.
+
 As texturas são carregadas sob demanda, e o service worker não guarda nada em cache (o app é apenas online).
 
 ## Como converter para WebP

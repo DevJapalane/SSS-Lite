@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { bodies, getBodyById } from '../data/bodies'
-import { isRetrogradeSpin, spinSpeed } from './rotation'
+import { isRetrogradeSpin, spinPeriodScreenSeconds, spinSpeed } from './rotation'
 
 describe('spinSpeed', () => {
   it('makes Earth turn once in ~24 seconds', () => {
@@ -11,6 +11,19 @@ describe('spinSpeed', () => {
 
   it('is always positive, even for negative periods', () => {
     for (const body of bodies) expect(spinSpeed(body)).toBeGreaterThan(0)
+  })
+
+  it('makes every body visibly turn, the slowest (Venus) in under 3 minutes', () => {
+    for (const body of bodies) expect(spinPeriodScreenSeconds(body)).toBeLessThan(180)
+    expect(spinPeriodScreenSeconds(getBodyById('venus'))).toBeGreaterThan(120)
+  })
+
+  it('keeps the real order of the days', () => {
+    const byRealDay = [...bodies].sort(
+      (a, b) => Math.abs(a.rotationPeriodHours) - Math.abs(b.rotationPeriodHours),
+    )
+    const periods = byRealDay.map(spinPeriodScreenSeconds)
+    expect(periods).toEqual([...periods].sort((a, b) => a - b))
   })
 })
 
