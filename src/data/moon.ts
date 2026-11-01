@@ -29,5 +29,6 @@ export const moon: Satellite = {
   // 384.400 km ≈ 30 Earth diameters.
   distanceFromParentKm: 384400,
   fallbackColor: '#a7a39c',
-  // No texture yet: see public/textures/README.md (2k_moon.jpg → moon.webp).
+  // 1K instead of 2K: the Moon is always small on screen (0,27 of Earth).
+  texture: 'moon.webp',
 }
