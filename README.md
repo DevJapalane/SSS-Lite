@@ -1,4 +1,4 @@
-# SSS Lite
+# Solar System Simulator Lite
 
 ### O Sistema Solar inteiro, em 3D, na palma da sua mão.
 
